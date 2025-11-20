@@ -1,29 +1,28 @@
-import { Button } from "@whop/react/components";
-import Link from "next/link";
+import Registration from "@/components/Registration";
+import Leaderboard from "@/components/Leaderboard";
 
 export default function Page() {
 	return (
-		<div className="py-12 px-4 sm:px-6 lg:px-8">
-			<div className="max-w-2xl mx-auto rounded-3xl bg-gray-a2 p-4 border border-gray-a4">
-				<div className="text-center mt-8 mb-12">
-					<h1 className="text-8 font-bold text-gray-12 mb-4">
-						Welcome to Your Whop App
-					</h1>
-					<p className="text-4 text-gray-10">
-						Learn how to build your application on our docs
-					</p>
-				</div>
+		<div className="min-h-screen bg-black text-white selection:bg-blue-500/30">
+			{/* Background Gradient */}
+			<div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black pointer-events-none" />
 
-				<div className="justify-center flex w-full">
-					<Link
-						href="https://docs.whop.com/apps"
-						className="w-full"
-						target="_blank"
-					>
-						<Button variant="classic" className="w-full" size="4">
-							Developer Docs
-						</Button>
-					</Link>
+			<div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+				<div className="max-w-5xl mx-auto">
+					<div className="text-center mb-16">
+						<h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 mb-6 tracking-tight">
+							Clipper Leaderboard
+						</h1>
+						<p className="text-xl text-gray-400 max-w-2xl mx-auto">
+							Compete with other creators, track your performance, and earn rewards.
+						</p>
+					</div>
+
+					<Registration />
+
+					<div className="mt-20">
+						<Leaderboard />
+					</div>
 				</div>
 			</div>
 		</div>

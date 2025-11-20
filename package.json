@@ -9,12 +9,19 @@
 		"lint": "biome lint"
 	},
 	"dependencies": {
+		"@supabase/supabase-js": "^2.83.0",
 		"@vercel/functions": "^3.1.4",
 		"@whop/react": "0.3.0",
 		"@whop/sdk": "0.0.3",
+		"apify-client": "^2.20.0",
+		"clsx": "^2.1.1",
+		"dotenv": "^17.2.3",
+		"framer-motion": "^12.23.24",
+		"lucide-react": "^0.554.0",
 		"next": "16.0.0",
 		"react": "19.2.0",
-		"react-dom": "19.2.0"
+		"react-dom": "19.2.0",
+		"tailwind-merge": "^3.4.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",

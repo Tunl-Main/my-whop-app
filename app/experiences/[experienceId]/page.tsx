@@ -1,7 +1,7 @@
-import { Button } from "@whop/react/components";
 import { headers } from "next/headers";
-import Link from "next/link";
 import { whopsdk } from "@/lib/whop-sdk";
+import Registration from "@/components/Registration";
+import Leaderboard from "@/components/Leaderboard";
 
 export default async function ExperiencePage({
 	params,
@@ -13,48 +13,36 @@ export default async function ExperiencePage({
 	const { userId } = await whopsdk.verifyUserToken(await headers());
 
 	// Fetch the neccessary data we want from whop.
-	const [experience, user, access] = await Promise.all([
-		whopsdk.experiences.retrieve(experienceId),
+	const [user] = await Promise.all([
 		whopsdk.users.retrieve(userId),
-		whopsdk.users.checkAccess(experienceId, { id: userId }),
 	]);
 
-	const displayName = user.name || `@${user.username}`;
+	const displayName = user.name || user.username || `User ${userId}`;
+	const avatar = user.profile_pic_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`;
 
 	return (
-		<div className="flex flex-col p-8 gap-4">
-			<div className="flex justify-between items-center gap-4">
-				<h1 className="text-9">
-					Hi <strong>{displayName}</strong>!
-				</h1>
-				<Link href="https://docs.whop.com/apps" target="_blank">
-					<Button variant="classic" className="w-full" size="3">
-						Developer Docs
-					</Button>
-				</Link>
+		<div className="min-h-screen bg-black text-white selection:bg-blue-500/30">
+			{/* Background Gradient */}
+			<div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black pointer-events-none" />
+
+			<div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+				<div className="max-w-5xl mx-auto">
+					<div className="text-center mb-16">
+						<h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 mb-6 tracking-tight">
+							Clipper Leaderboard
+						</h1>
+						<p className="text-xl text-gray-400 max-w-2xl mx-auto">
+							Welcome back, <span className="text-white font-semibold">{displayName}</span>. Compete with other creators and track your performance.
+						</p>
+					</div>
+
+					<Registration userId={userId} username={displayName} avatar={avatar} />
+
+					<div className="mt-20">
+						<Leaderboard />
+					</div>
+				</div>
 			</div>
-
-			<p className="text-3 text-gray-10">
-				Welcome to you whop app! Replace this template with your own app. To
-				get you started, here's some helpful data you can fetch from whop.
-			</p>
-
-			<h3 className="text-6 font-bold">Experience data</h3>
-			<JsonViewer data={experience} />
-
-			<h3 className="text-6 font-bold">User data</h3>
-			<JsonViewer data={user} />
-
-			<h3 className="text-6 font-bold">Access data</h3>
-			<JsonViewer data={access} />
 		</div>
-	);
-}
-
-function JsonViewer({ data }: { data: any }) {
-	return (
-		<pre className="text-2 border border-gray-a4 rounded-lg p-4 bg-gray-a2 max-h-72 overflow-y-auto">
-			<code className="text-gray-10">{JSON.stringify(data, null, 2)}</code>
-		</pre>
 	);
 }

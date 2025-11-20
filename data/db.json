@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "id": "user_1",
+      "whopId": "whop_1",
+      "linkedAccounts": [
+        {
+          "platform": "instagram",
+          "handle": "top_clipper",
+          "id": "ig_1"
+        },
+        {
+          "platform": "tiktok",
+          "handle": "top_clipper_tt",
+          "id": "tt_1"
+        }
+      ],
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user_1",
+      "metrics": {
+        "views": 150000,
+        "shares": 4500,
+        "earnings": 1200
+      },
+      "achievements": [
+        {
+          "id": "ach_1",
+          "name": "100k Views",
+          "icon": "🔥",
+          "date": 1700000000000
+        },
+        {
+          "id": "ach_2",
+          "name": "Top Earner",
+          "icon": "💰",
+          "date": 1700000000000
+        }
+      ]
+    },
+    {
+      "id": "user_2",
+      "whopId": "whop_2",
+      "linkedAccounts": [
+        {
+          "platform": "instagram",
+          "handle": "viral_king",
+          "id": "ig_2"
+        }
+      ],
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user_2",
+      "metrics": {
+        "views": 120000,
+        "shares": 3200,
+        "earnings": 950
+      },
+      "achievements": [
+        {
+          "id": "ach_1",
+          "name": "100k Views",
+          "icon": "🔥",
+          "date": 1700000000000
+        }
+      ]
+    },
+    {
+      "id": "user_3",
+      "whopId": "whop_3",
+      "linkedAccounts": [
+        {
+          "platform": "youtube",
+          "handle": "content_machine",
+          "id": "yt_3"
+        }
+      ],
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user_3",
+      "metrics": {
+        "views": 85000,
+        "shares": 2100,
+        "earnings": 600
+      },
+      "achievements": []
+    },
+    {
+      "id": "user_0yihsRzkg6E0X",
+      "whopId": "user_0yihsRzkg6E0X",
+      "metrics": {
+        "views": 0,
+        "shares": 0
+      },
+      "otp": "883837",
+      "otpExpires": 1763582900152,
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user_0yihsRzkg6E0X"
+    }
+  ]
+}
