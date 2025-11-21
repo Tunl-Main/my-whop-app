@@ -6,6 +6,8 @@ import { Copy, Check, Loader2, Instagram, Youtube, Twitter } from "lucide-react"
 import { Button } from "@whop/react/components";
 import clsx from "clsx";
 import BioVerification from "./BioVerification";
+import MiniProfile from "./MiniProfile";
+import { useEffect } from "react";
 
 // Custom TikTok Icon
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -36,6 +38,25 @@ export default function Registration({
     const [copied, setCopied] = useState(false);
     const [isLinked, setIsLinked] = useState(false);
     const [showBioVerification, setShowBioVerification] = useState(false);
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        if (propUserId) {
+            fetch(`/api/user?whopId=${propUserId}`)
+                .then(res => {
+                    if (res.ok) return res.json();
+                    return null;
+                })
+                .then(data => {
+                    if (data) setUser(data);
+                })
+                .catch(console.error);
+        }
+    }, [propUserId]);
+
+    if (user) {
+        return <MiniProfile user={user} username={propUsername || "User"} />;
+    }
 
     const handleConnect = async () => {
         if (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube' || selectedPlatform === 'instagram') {
