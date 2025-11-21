@@ -60,8 +60,8 @@ export async function POST(request: Request) {
             );
         }
 
-        // 2. Check if code is in bio
-        if (!bio.includes(code)) {
+        // 2. Check if code is in bio (case-insensitive)
+        if (!bio.toLowerCase().includes(code.toLowerCase())) {
             return NextResponse.json(
                 { error: "Verification code not found in bio" },
                 { status: 400 }

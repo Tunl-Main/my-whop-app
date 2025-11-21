@@ -26,23 +26,19 @@ export interface SocialMetrics {
 export async function scrapeInstagramProfile(username: string): Promise<SocialMetrics | null> {
     try {
         const run = await client.actor(INSTAGRAM_SCRAPER_ID).call({
-            usernames: [username],
-            resultsLimit: 10, // Get last 10 posts
+            directUrls: [`https://www.instagram.com/${username}/`],
+            resultsLimit: 12, // Get a few posts + profile
         });
 
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
         if (!items || items.length === 0) return null;
 
-        // The scraper returns a mix of profile info and posts. 
-        // Usually the first item or items with 'ownerUsername' contain the data.
-        // We need to filter and aggregate.
-
-        // Find profile info (usually in the first item or a specific type)
-        const profile = items.find((item: any) => item.username === username || item.ownerUsername === username);
+        // Find profile info (must have biography or followersCount)
+        const profile = items.find((item: any) => item.biography !== undefined || item.followersCount !== undefined);
 
         if (!profile) return null;
 
-        const posts = items.filter((item: any) => item.type === 'Post' || item.shortCode).map((post: any) => ({
+        const posts = items.filter((item: any) => (item.type === 'Post' || item.shortCode) && item.id !== profile.id).map((post: any) => ({
             url: `https://www.instagram.com/p/${post.shortCode || post.code}/`,
             thumbnail: post.displayUrl || post.thumbnailSrc,
             views: post.videoViewCount || 0,
