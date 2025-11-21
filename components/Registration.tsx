@@ -38,11 +38,11 @@ export default function Registration({
     const [showBioVerification, setShowBioVerification] = useState(false);
 
     const handleConnect = async () => {
-        if (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube') {
+        if (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube' || selectedPlatform === 'instagram') {
             setShowBioVerification(true);
         } else {
-            // Instagram Flow (OTP)
-            await handleRegister();
+            // Instagram Flow (OTP) - Legacy/Preserved
+            // await handleRegister();
         }
     };
 
@@ -223,7 +223,7 @@ export default function Registration({
             </div>
 
             {/* Bio Verification Modal */}
-            {showBioVerification && (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube') && (
+            {showBioVerification && (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube' || selectedPlatform === 'instagram') && (
                 <BioVerification
                     isOpen={showBioVerification}
                     onClose={() => setShowBioVerification(false)}

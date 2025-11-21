@@ -40,6 +40,18 @@ export async function POST(request: Request) {
             // Let's assume we update lib/apify.ts to include 'bio' in SocialMetrics
             bio = (metrics as any).bio || "";
             profileData = metrics;
+        } else if (platform === "instagram") {
+            const cleanHandle = handle.replace("@", "").trim();
+            const metrics = await scrapeInstagramProfile(cleanHandle);
+
+            if (!metrics) {
+                return NextResponse.json(
+                    { error: "Could not find Instagram profile" },
+                    { status: 404 }
+                );
+            }
+            bio = metrics.bio || "";
+            profileData = metrics;
         } else if (platform === "youtube") {
             // Placeholder for YouTube
             return NextResponse.json(

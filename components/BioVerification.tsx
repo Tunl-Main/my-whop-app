@@ -8,7 +8,7 @@ import { FrostedGlass } from "./FrostedGlass";
 interface BioVerificationProps {
     isOpen: boolean;
     onClose: () => void;
-    platform: "tiktok" | "youtube";
+    platform: "tiktok" | "youtube" | "instagram";
     onVerify: (handle: string, code: string) => Promise<void>;
 }
 
@@ -50,11 +50,13 @@ export default function BioVerification({
         }
     };
 
-    const platformName = platform === "tiktok" ? "TikTok" : "YouTube";
+    const platformName = platform === "tiktok" ? "TikTok" : platform === "instagram" ? "Instagram" : "YouTube";
     const profileUrl =
         platform === "tiktok"
             ? `https://www.tiktok.com/@${handle.replace("@", "")}`
-            : `https://www.youtube.com/${handle}`;
+            : platform === "instagram"
+                ? `https://www.instagram.com/${handle.replace("@", "")}/`
+                : `https://www.youtube.com/${handle}`;
 
     return (
         <AnimatePresence>
