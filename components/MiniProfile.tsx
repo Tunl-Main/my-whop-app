@@ -52,38 +52,47 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
 
     return (
         <div
-            className="relative z-50 w-full max-w-md mx-auto mb-12"
+            className="relative z-50 w-full max-w-md mx-auto mb-12 group"
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)}
         >
-            <FrostedGlass className="rounded-2xl overflow-hidden transition-all duration-300 hover:bg-white/10">
+            {/* Ambient Glow */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500/20 to-purple-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
+
+            <FrostedGlass variant="premium" className="relative rounded-3xl overflow-hidden transition-all duration-500">
                 {/* Header / Collapsed View */}
-                <div className="p-4 flex items-center gap-4 cursor-pointer">
-                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500/50">
-                        <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover" />
+                <div className="p-5 flex items-center gap-5 cursor-pointer relative z-10">
+                    <div className="relative">
+                        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 shadow-inner">
+                            <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover" />
+                        </div>
+                        {/* Status Dot */}
+                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full" />
                     </div>
 
                     <div className="flex-grow">
-                        <h3 className="text-white font-semibold text-lg">{username}</h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                            <span className="flex items-center gap-1">
-                                <Trophy className="w-3 h-3 text-orange-400" />
-                                {user.achievements.length} Badges
-                            </span>
-                            <span>•</span>
-                            <span className="font-mono text-orange-400 font-medium">
-                                ${user.metrics.earnings?.toLocaleString() || 0}
-                            </span>
+                        <h3 className="text-white font-bold text-xl tracking-tight">{username}</h3>
+                        <div className="flex items-center gap-3 text-sm text-gray-400 mt-1">
+                            <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                                <Trophy className="w-3.5 h-3.5 text-orange-400" />
+                                <span className="font-medium text-gray-300">{user.achievements.length}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                                <span className="text-orange-400 font-bold">$</span>
+                                <span className="font-mono text-gray-300">{user.metrics.earnings?.toLocaleString() || 0}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                        {user.achievements.slice(0, 3).map((ach, i) => (
-                            <div key={i} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs border border-white/10" title={ach.name}>
-                                {ach.icon}
-                            </div>
-                        ))}
-                        <ChevronDown className={clsx("w-5 h-5 text-gray-500 transition-transform", isExpanded ? "rotate-180" : "")} />
+                    <div className="flex flex-col items-end gap-1">
+                        <div className="flex -space-x-2">
+                            {user.achievements.slice(0, 3).map((ach, i) => (
+                                <div key={i} className="w-7 h-7 rounded-full bg-black/80 flex items-center justify-center text-xs border border-white/10 shadow-lg relative z-10" title={ach.name}>
+                                    {ach.icon}
+                                </div>
+                            ))}
+                        </div>
+                        <ChevronDown className={clsx("w-5 h-5 text-gray-500 transition-transform duration-300", isExpanded ? "rotate-180" : "")} />
                     </div>
                 </div>
 
@@ -94,42 +103,55 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
+                            className="overflow-hidden bg-black/20"
                         >
-                            <div className="px-4 pb-4 pt-0 border-t border-white/5 space-y-4">
+                            <div className="px-5 pb-6 pt-2 space-y-5">
+                                {/* Divider */}
+                                <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
                                 {/* Next Achievement Progress */}
                                 {nextBadge ? (
-                                    <div className="mt-4">
-                                        <div className="flex justify-between text-xs text-gray-400 mb-1">
-                                            <span>Next: {nextBadge.name}</span>
-                                            <span>{Math.round(progress)}%</span>
+                                    <div>
+                                        <div className="flex justify-between items-end mb-2">
+                                            <div>
+                                                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Next Goal</p>
+                                                <p className="text-sm text-white font-medium">{nextBadge.name}</p>
+                                            </div>
+                                            <span className="text-xs font-mono text-orange-400">{Math.round(progress)}%</span>
                                         </div>
-                                        <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+
+                                        <div className="relative w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${progress}%` }}
-                                                className="h-full bg-gradient-to-r from-orange-500 to-red-500"
+                                                className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]"
                                             />
                                         </div>
-                                        <p className="text-[10px] text-gray-500 mt-1 text-right">
-                                            {nextBadge.type === "earnings" ? "$" : ""}{(nextBadge.type === "earnings" ? (user.metrics.earnings || 0) : user.metrics.views).toLocaleString()} / {nextBadge.threshold.toLocaleString()}
+
+                                        <p className="text-[10px] text-gray-500 mt-1.5 text-right font-mono">
+                                            {nextBadge.type === "earnings" ? "$" : ""}{(nextBadge.type === "earnings" ? (user.metrics.earnings || 0) : user.metrics.views).toLocaleString()} <span className="text-gray-700">/</span> {nextBadge.threshold.toLocaleString()}
                                         </p>
                                     </div>
                                 ) : (
-                                    <div className="mt-4 text-center text-sm text-orange-400 font-medium">
-                                        All achievements unlocked! 🏆
+                                    <div className="text-center py-2">
+                                        <p className="text-sm text-orange-400 font-medium">All achievements unlocked! 🏆</p>
                                     </div>
                                 )}
 
-                                {/* Recent Achievements */}
+                                {/* Recent Achievements Grid */}
                                 {user.achievements.length > 0 && (
                                     <div>
-                                        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Recent Badges</h4>
-                                        <div className="grid grid-cols-4 gap-2">
+                                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-3">Collection</p>
+                                        <div className="grid grid-cols-4 gap-3">
                                             {user.achievements.map((ach) => (
-                                                <div key={ach.id} className="flex flex-col items-center gap-1 p-2 rounded-lg bg-white/5 border border-white/5">
-                                                    <span className="text-lg">{ach.icon}</span>
-                                                    <span className="text-[10px] text-gray-400 text-center leading-tight">{ach.name}</span>
+                                                <div key={ach.id} className="group/badge flex flex-col items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-orange-500/30 transition-all cursor-help">
+                                                    <span className="text-xl filter drop-shadow-lg group-hover/badge:scale-110 transition-transform">{ach.icon}</span>
+                                                </div>
+                                            ))}
+                                            {/* Empty slots filler */}
+                                            {[...Array(Math.max(0, 4 - user.achievements.length))].map((_, i) => (
+                                                <div key={`empty-${i}`} className="flex flex-col items-center justify-center p-2 rounded-xl border border-white/5 border-dashed opacity-30">
+                                                    <div className="w-4 h-4 rounded-full bg-white/10" />
                                                 </div>
                                             ))}
                                         </div>
