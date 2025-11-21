@@ -18,7 +18,7 @@ export default async function ExperiencePage({
 	]);
 
 	const displayName = user.name || user.username || `User ${userId}`;
-	const avatar = user.profile_pic_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`;
+	const avatar = user.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`;
 
 	return (
 		<div className="min-h-screen bg-black text-white selection:bg-blue-500/30">
