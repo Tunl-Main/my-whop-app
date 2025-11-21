@@ -12,6 +12,7 @@ export interface SocialMetrics {
     followers: number;
     following: number;
     postsCount: number;
+    bio?: string;
     recentPosts: {
         url: string;
         thumbnail: string;
@@ -54,6 +55,7 @@ export async function scrapeInstagramProfile(username: string): Promise<SocialMe
             followers: Number(profile.followersCount) || 0,
             following: Number(profile.followsCount) || 0,
             postsCount: Number(profile.postsCount) || 0,
+            bio: String(profile.biography || ""),
             recentPosts: posts.slice(0, 10),
         };
     } catch (error) {
@@ -89,6 +91,7 @@ export async function scrapeTikTokProfile(username: string): Promise<SocialMetri
             followers: authorMeta?.fans || 0,
             following: authorMeta?.following || 0,
             postsCount: authorMeta?.video || 0,
+            bio: authorMeta?.signature || "",
             recentPosts: posts.slice(0, 10),
         };
     } catch (error) {

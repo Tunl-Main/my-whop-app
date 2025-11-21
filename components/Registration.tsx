@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Loader2, Instagram, Youtube, Twitter } from "lucide-react";
 import { Button } from "@whop/react/components";
 import clsx from "clsx";
+import BioVerification from "./BioVerification";
 
 // Custom TikTok Icon
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -17,7 +18,7 @@ const PLATFORMS = [
     { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'text-pink-500' },
     { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, color: 'text-white' },
     { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'text-red-500' },
-    { id: 'twitter', name: 'Twitter', icon: Twitter, color: 'text-blue-400' },
+    // { id: 'twitter', name: 'Twitter', icon: Twitter, color: 'text-blue-400' }, // Twitter not supported yet
 ] as const;
 
 export default function Registration({
@@ -34,6 +35,16 @@ export default function Registration({
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isLinked, setIsLinked] = useState(false);
+    const [showBioVerification, setShowBioVerification] = useState(false);
+
+    const handleConnect = async () => {
+        if (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube') {
+            setShowBioVerification(true);
+        } else {
+            // Instagram Flow (OTP)
+            await handleRegister();
+        }
+    };
 
     const handleRegister = async () => {
         setLoading(true);
@@ -49,15 +60,18 @@ export default function Registration({
                     userId,
                     username,
                     avatar,
-                    platform: selectedPlatform // Pass platform to API
+                    platform: selectedPlatform
                 }),
             });
             const data = await res.json();
             setOtp(data.otp);
 
+            // Poll for completion or listen to webhook? 
+            // For now we just simulate or wait for user to do it.
+            // In a real app, we'd poll an endpoint to check if linked.
             setTimeout(() => {
-                setIsLinked(true);
-                setOtp(null);
+                // setIsLinked(true); // Don't auto-link for IG, wait for webhook
+                // setOtp(null);
             }, 10000);
 
         } catch (error) {
@@ -65,6 +79,25 @@ export default function Registration({
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleBioVerify = async (handle: string) => {
+        const userId = propUserId || "user_" + Math.floor(Math.random() * 10000);
+        const code = "WHOP-CODE"; // This should be passed from the modal, but for now the modal generates it.
+        // Actually, the modal generates the code. We need to pass the code to the API?
+        // The API expects 'code' to check against bio.
+        // The modal generates the code internally. We should probably move code generation up or let the modal handle the API call?
+        // The modal prop `onVerify` takes `handle`.
+        // Let's update the modal to pass the code back or handle the API call internally?
+        // No, `onVerify` is async.
+        // The modal generates the code. The modal should probably pass the code to `onVerify` or `onVerify` should just take the handle and the modal sends the code it generated?
+        // Ah, the modal generates the code, so the modal knows it.
+        // But `onVerify` is defined here.
+        // I should update `BioVerification` to pass `code` to `onVerify`.
+
+        // Let's assume I'll update BioVerification to pass code.
+        // For now, I'll just make the API call inside the modal? No, better here.
+        // I will update BioVerification to pass code.
     };
 
     const copyToClipboard = () => {
@@ -124,7 +157,7 @@ export default function Registration({
                             exit={{ opacity: 0 }}
                         >
                             <Button
-                                onClick={handleRegister}
+                                onClick={handleConnect}
                                 disabled={loading}
                                 size="4"
                                 className="w-full font-semibold capitalize bg-orange-500 hover:bg-orange-600 text-white border-none"
@@ -188,6 +221,31 @@ export default function Registration({
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* Bio Verification Modal */}
+            {showBioVerification && (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube') && (
+                <BioVerification
+                    isOpen={showBioVerification}
+                    onClose={() => setShowBioVerification(false)}
+                    platform={selectedPlatform}
+                    onVerify={async (handle: string, code: string) => {
+                        const userId = propUserId || "user_" + Math.floor(Math.random() * 10000);
+                        const res = await fetch("/api/verify-bio", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                userId,
+                                platform: selectedPlatform,
+                                handle,
+                                code
+                            }),
+                        });
+                        const data = await res.json();
+                        if (data.error) throw new Error(data.error);
+                        setIsLinked(true);
+                    }}
+                />
+            )}
         </div>
     );
 }
