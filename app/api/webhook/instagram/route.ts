@@ -49,8 +49,9 @@ export async function POST(request: Request) {
                             const instagramId = event.sender.id;
 
                             // We don't get the handle directly in the webhook, only the ID.
-                            // In a production app, you'd use the ID to fetch the profile.
-                            // For now, we'll use the ID as the handle or a placeholder.
+                            // NOTE: This is for the legacy DM verification flow.
+                            // For Bio verification, we scrape the handle directly.
+                            // Here we use ID as handle fallback.
                             const instagramHandle = instagramId;
 
                             await linkAccount(otp, instagramId, instagramHandle);

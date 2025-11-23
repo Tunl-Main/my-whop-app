@@ -194,3 +194,46 @@ export async function addMetric(userId: string, metric: keyof User['metrics'], v
       .eq('user_id', userId);
   }
 }
+
+export interface Clip {
+  id: string;
+  thumbnail: string;
+  views: number;
+  likes: number;
+  url: string;
+  creator: {
+    username: string;
+    avatar: string;
+  };
+}
+
+export async function getTopClips(limit: number = 10): Promise<Clip[]> {
+  const { data, error } = await supabase
+    .from('clips')
+    .select(`
+      *,
+      users (
+        whop_id,
+        avatar
+      )
+    `)
+    .order('views', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching clips:', error);
+    return [];
+  }
+
+  return data.map((row: any) => ({
+    id: row.id,
+    thumbnail: row.thumbnail || '',
+    views: row.views,
+    likes: row.likes,
+    url: row.url,
+    creator: {
+      username: row.users?.whop_id || 'Unknown', // Using whop_id as username for now
+      avatar: row.users?.avatar || ''
+    }
+  }));
+}

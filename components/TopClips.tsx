@@ -15,46 +15,44 @@ interface Clip {
     };
 }
 
-// Mock data for now
-const MOCK_CLIPS: Clip[] = [
-    {
-        id: "1",
-        thumbnail: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80",
-        views: 125000,
-        likes: 12000,
-        url: "#",
-        creator: { username: "alex_clips", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex" }
-    },
-    {
-        id: "2",
-        thumbnail: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=800&q=80",
-        views: 98000,
-        likes: 8500,
-        url: "#",
-        creator: { username: "sarah_vids", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah" }
-    },
-    {
-        id: "3",
-        thumbnail: "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&q=80",
-        views: 45000,
-        likes: 3200,
-        url: "#",
-        creator: { username: "mike_drops", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=mike" }
-    }
-];
+import { useState, useEffect } from "react";
 
 export default function TopClips() {
+    const [clips, setClips] = useState<Clip[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/clips')
+            .then(res => res.json())
+            .then(data => {
+                setClips(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Error fetching clips:", err);
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) {
+        return <div className="text-center text-gray-500 py-12">Loading top clips...</div>;
+    }
+
+    if (clips.length === 0) {
+        return <div className="text-center text-gray-500 py-12">No clips found yet. Connect your account to get started!</div>;
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">Top Clips
-                    <span className="ml-2 text-sm font-normal text-gray-400 bg-white/10 px-2 py-1 rounded-full">This Week</span>
+                    <span className="ml-2 text-sm font-normal text-gray-400 bg-white/10 px-2 py-1 rounded-full">All Time</span>
                 </h2>
             </div>
 
             {/* Top 3 Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {MOCK_CLIPS.slice(0, 3).map((clip, index) => (
+                {clips.slice(0, 3).map((clip, index) => (
                     <motion.a
                         key={clip.id}
                         href={clip.url}
@@ -118,10 +116,10 @@ export default function TopClips() {
                     <div className="col-span-2 text-right">Likes</div>
                 </div>
                 <div className="divide-y divide-white/5">
-                    {MOCK_CLIPS.slice(3).length === 0 && (
+                    {clips.slice(3).length === 0 && (
                         <div className="p-8 text-center text-gray-500">More clips coming soon...</div>
                     )}
-                    {MOCK_CLIPS.slice(3).map((clip, index) => (
+                    {clips.slice(3).map((clip, index) => (
                         <div key={clip.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/5 transition-colors">
                             <div className="col-span-1 text-center font-bold text-gray-500">
                                 {index + 4}
