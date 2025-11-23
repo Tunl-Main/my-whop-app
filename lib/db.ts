@@ -117,7 +117,10 @@ export async function createUser(user: User) {
       otp_expires: user.otpExpires
     });
 
-  if (userError) console.error('Error creating user:', userError);
+  if (userError) {
+    console.error('Error creating user:', userError);
+    throw new Error(`Failed to create user: ${userError.message}`);
+  }
 
   // 2. Create Metrics entry
   const { error: metricsError } = await supabase
@@ -151,13 +154,15 @@ export async function updateLinkedAccount(userId: string, account: LinkedAccount
   // First check if exists to update or insert
   // For simplicity in this demo, we'll delete existing for platform and insert new
 
-  await supabase
+  const { error: deleteError } = await supabase
     .from('linked_accounts')
     .delete()
     .eq('user_id', userId)
     .eq('platform', account.platform);
 
-  await supabase
+  if (deleteError) console.error("DB: Error deleting linked account:", deleteError);
+
+  const { error: insertError } = await supabase
     .from('linked_accounts')
     .insert({
       user_id: userId,
@@ -165,6 +170,11 @@ export async function updateLinkedAccount(userId: string, account: LinkedAccount
       handle: account.handle,
       platform_user_id: account.id
     });
+
+  if (insertError) {
+    console.error("DB: Error inserting linked account:", insertError);
+    throw new Error(`Failed to link account: ${insertError.message}`);
+  }
 }
 
 export async function addMetric(userId: string, metric: keyof User['metrics'], value: number) {

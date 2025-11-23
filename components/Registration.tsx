@@ -7,6 +7,7 @@ import { Button } from "@whop/react/components";
 import clsx from "clsx";
 import BioVerification from "./BioVerification";
 import MiniProfile from "./MiniProfile";
+import { FrostedGlass } from "./FrostedGlass";
 import { useEffect } from "react";
 
 // Custom TikTok Icon
@@ -50,11 +51,11 @@ export default function Registration({
                 .then(data => {
                     if (data) setUser(data);
                 })
-                .catch(console.error);
+                .catch(err => console.error("Error fetching user:", err));
         }
     }, [propUserId]);
 
-    if (user) {
+    if (user && user.linkedAccounts && user.linkedAccounts.length > 0) {
         return <MiniProfile user={user} username={propUsername || "User"} />;
     }
 
@@ -131,7 +132,7 @@ export default function Registration({
 
     return (
         <div className="w-full max-w-md mx-auto mb-12">
-            <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 shadow-xl text-center">
+            <FrostedGlass variant="premium" className="rounded-2xl p-6 text-center">
                 <h2 className="text-2xl font-bold text-white mb-2">Join the Leaderboard</h2>
                 <p className="text-gray-400 mb-6 text-sm">
                     Sync your accounts to compete.
@@ -147,7 +148,7 @@ export default function Registration({
                                 className={clsx(
                                     "p-3 rounded-xl border transition-all",
                                     selectedPlatform === p.id
-                                        ? "bg-white/10 border-white/30 scale-110"
+                                        ? "bg-white/10 border-white/30 scale-110 shadow-lg shadow-orange-500/20"
                                         : "bg-transparent border-transparent hover:bg-white/5 opacity-50 hover:opacity-100"
                                 )}
                                 title={p.name}
@@ -165,7 +166,7 @@ export default function Registration({
                             animate={{ scale: 1, opacity: 1 }}
                             className="flex flex-col items-center py-4"
                         >
-                            <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
                                 <Check className="w-8 h-8 text-orange-500" />
                             </div>
                             <h3 className="text-xl font-semibold text-white">Account Linked!</h3>
@@ -181,7 +182,7 @@ export default function Registration({
                                 onClick={handleConnect}
                                 disabled={loading}
                                 size="4"
-                                className="w-full font-semibold capitalize bg-orange-500 hover:bg-orange-600 text-white border-none"
+                                className="w-full font-semibold capitalize bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white border-none shadow-lg shadow-orange-500/20"
                             >
                                 {loading ? (
                                     <span className="flex items-center gap-2">
@@ -199,10 +200,10 @@ export default function Registration({
                             exit={{ y: -20, opacity: 0 }}
                             className="space-y-4"
                         >
-                            <div className="bg-black/20 rounded-xl p-4 border border-white/5">
+                            <div className="bg-black/40 rounded-xl p-4 border border-white/5">
                                 <p className="text-xs text-gray-400 mb-2 uppercase tracking-wider">One-Time Password</p>
                                 <div
-                                    className="flex items-center justify-between bg-black/40 rounded-lg p-3 cursor-pointer hover:bg-black/50 transition-colors group"
+                                    className="flex items-center justify-between bg-black/40 rounded-lg p-3 cursor-pointer hover:bg-black/50 transition-colors group border border-white/5"
                                     onClick={copyToClipboard}
                                 >
                                     <code className="text-2xl font-mono font-bold text-white tracking-widest">
@@ -214,7 +215,7 @@ export default function Registration({
                                 </div>
                             </div>
 
-                            <div className="text-left text-sm text-gray-400 space-y-2 bg-orange-500/10 p-4 rounded-xl border border-orange-500/20">
+                            <div className="text-left text-sm text-gray-400 space-y-2 bg-orange-500/5 p-4 rounded-xl border border-orange-500/10">
                                 <p className="font-medium text-orange-400">Instructions:</p>
                                 <ol className="list-decimal list-inside space-y-1 ml-1">
                                     <li>Copy the code above</li>
@@ -231,7 +232,7 @@ export default function Registration({
                                     <Button
                                         variant="ghost"
                                         size="3"
-                                        className="w-full border border-orange-500/50 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300"
+                                        className="w-full border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300"
                                     >
                                         <Instagram className="w-4 h-4 mr-2" />
                                         Click here to paste code
@@ -241,7 +242,7 @@ export default function Registration({
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
+            </FrostedGlass>
 
             {/* Bio Verification Modal */}
             {showBioVerification && (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube' || selectedPlatform === 'instagram') && (
@@ -256,6 +257,8 @@ export default function Registration({
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 userId,
+                                username: propUsername,
+                                avatar: propAvatar,
                                 platform: selectedPlatform,
                                 handle,
                                 code
@@ -264,6 +267,8 @@ export default function Registration({
                         const data = await res.json();
                         if (data.error) throw new Error(data.error);
                         setIsLinked(true);
+                        // Refresh user data to show MiniProfile immediately
+                        setUser(data.user);
                     }}
                 />
             )}
