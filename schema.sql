@@ -24,8 +24,12 @@ create table metrics (
   id uuid default gen_random_uuid() primary key,
   user_id text references users(id) on delete cascade,
   views bigint default 0,
+  likes bigint default 0,
   shares bigint default 0,
   earnings bigint default 0,
+  avg_views bigint default 0,
+  avg_likes bigint default 0,
+  total_posts bigint default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
   unique(user_id)
 );

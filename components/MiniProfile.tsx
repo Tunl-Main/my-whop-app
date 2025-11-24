@@ -17,10 +17,15 @@ interface User {
     id: string;
     whopId: string;
     avatar?: string;
+    linkedAccounts?: { platform: string; handle: string }[];
     metrics: {
         views: number;
+        likes?: number;
         shares: number;
         earnings?: number;
+        avg_views?: number;
+        avg_likes?: number;
+        total_posts?: number;
     };
     achievements: Achievement[];
 }
@@ -50,6 +55,9 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
         ? Math.min(100, ((nextBadge.type === "earnings" ? (user.metrics.earnings || 0) : user.metrics.views) / nextBadge.threshold) * 100)
         : 100;
 
+    const linkedAccount = user.linkedAccounts && user.linkedAccounts.length > 0 ? user.linkedAccounts[0] : null;
+    const isSyncing = user.metrics.total_posts === 0 && linkedAccount; // Simple heuristic for syncing
+
     return (
         <div
             className="relative z-50 w-full max-w-md mx-auto mb-12 group"
@@ -67,12 +75,22 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                             <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover" />
                         </div>
                         {/* Status Dot */}
-                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full" />
+                        <div className={clsx(
+                            "absolute bottom-0 right-0 w-4 h-4 border-2 border-black rounded-full animate-pulse",
+                            isSyncing ? "bg-yellow-500" : "bg-green-500"
+                        )} />
                     </div>
 
                     <div className="flex-grow">
                         <h3 className="text-white font-bold text-xl tracking-tight">{username}</h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-400 mt-1">
+                        {linkedAccount && (
+                            <p className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                                <span className="capitalize text-orange-400">{linkedAccount.platform}</span>
+                                <span>@{linkedAccount.handle}</span>
+                                {isSyncing && <span className="text-yellow-500 ml-2 animate-pulse">(Syncing...)</span>}
+                            </p>
+                        )}
+                        <div className="flex items-center gap-3 text-sm text-gray-400 mt-2">
                             <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
                                 <Trophy className="w-3.5 h-3.5 text-orange-400" />
                                 <span className="font-medium text-gray-300">{user.achievements.length}</span>
@@ -108,6 +126,32 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                             <div className="px-5 pb-6 pt-2 space-y-5">
                                 {/* Divider */}
                                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                                {/* Detailed Metrics Grid */}
+                                <div className="grid grid-cols-2 gap-2 mb-2">
+                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                        <p className="text-[10px] text-gray-500 uppercase">Total Views</p>
+                                        <p className="text-white font-mono text-sm">{(user.metrics.views || 0).toLocaleString()}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                        <p className="text-[10px] text-gray-500 uppercase">Total Likes</p>
+                                        <p className="text-white font-mono text-sm">{(user.metrics.likes || 0).toLocaleString()}</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                        <p className="text-[10px] text-gray-500 uppercase">Avg Views</p>
+                                        <p className="text-white font-mono text-sm">{(user.metrics.avg_views || 0).toLocaleString()}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                        <p className="text-[10px] text-gray-500 uppercase">Avg Likes</p>
+                                        <p className="text-white font-mono text-sm">{(user.metrics.avg_likes || 0).toLocaleString()}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                        <p className="text-[10px] text-gray-500 uppercase">Posts</p>
+                                        <p className="text-white font-mono text-sm">{(user.metrics.total_posts || 0).toLocaleString()}</p>
+                                    </div>
+                                </div>
 
                                 {/* Next Achievement Progress */}
                                 {nextBadge ? (

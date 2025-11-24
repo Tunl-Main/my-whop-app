@@ -46,8 +46,17 @@ export async function POST(request: Request) {
             id: handle // Use handle as ID since we don't scrape platform ID yet
         });
 
-        // 4. Trigger initial metrics update
-        updateUserMetrics(dbUserId, platform, handle).catch(console.error);
+        // 4. Trigger initial metrics update (Quick Scrape)
+        // We await this one to ensure we have *some* data immediately
+        await updateUserMetrics(dbUserId, platform, handle, 12);
+
+        // 5. Trigger Deep Scrape (Background)
+        // We do NOT await this, so the UI returns immediately
+        // This will fetch up to 100 posts (or whatever limit we set)
+        console.log("Triggering background deep scrape...");
+        updateUserMetrics(dbUserId, platform, handle, 100).catch(err =>
+            console.error("Background deep scrape error:", err)
+        );
 
         // Fetch updated user to return
         const updatedUser = await getUser(userId); // getUser uses whopId, so userId is correct here

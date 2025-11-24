@@ -23,11 +23,11 @@ export interface SocialMetrics {
     }[];
 }
 
-export async function scrapeInstagramProfile(username: string): Promise<SocialMetrics | null> {
+export async function scrapeInstagramProfile(username: string, limit: number = 12): Promise<SocialMetrics | null> {
     try {
         const run = await client.actor(INSTAGRAM_SCRAPER_ID).call({
             directUrls: [`https://www.instagram.com/${username}/`],
-            resultsLimit: 12, // Get a few posts + profile
+            resultsLimit: limit,
         });
 
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
@@ -52,7 +52,7 @@ export async function scrapeInstagramProfile(username: string): Promise<SocialMe
             following: Number(profile.followsCount) || 0,
             postsCount: Number(profile.postsCount) || 0,
             bio: String(profile.biography || ""),
-            recentPosts: posts.slice(0, 10),
+            recentPosts: posts, // Return all fetched posts
         };
     } catch (error) {
         console.error(`Error scraping Instagram for ${username}:`, error);
@@ -60,11 +60,11 @@ export async function scrapeInstagramProfile(username: string): Promise<SocialMe
     }
 }
 
-export async function scrapeTikTokProfile(username: string): Promise<SocialMetrics | null> {
+export async function scrapeTikTokProfile(username: string, limit: number = 10): Promise<SocialMetrics | null> {
     try {
         const run = await client.actor(TIKTOK_SCRAPER_ID).call({
             profiles: [username],
-            resultsPerPage: 10,
+            resultsPerPage: limit,
         });
 
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
@@ -88,7 +88,7 @@ export async function scrapeTikTokProfile(username: string): Promise<SocialMetri
             following: authorMeta?.following || 0,
             postsCount: authorMeta?.video || 0,
             bio: authorMeta?.signature || "",
-            recentPosts: posts.slice(0, 10),
+            recentPosts: posts,
         };
     } catch (error) {
         console.error(`Error scraping TikTok for ${username}:`, error);
