@@ -6,6 +6,23 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ hostname: "**" }],
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'ALLOW-FROM https://whop.com',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self' https://*.whop.com https://whop.com",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withWhopAppConfig(nextConfig);
