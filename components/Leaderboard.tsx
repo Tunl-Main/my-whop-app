@@ -130,13 +130,19 @@ export default function Leaderboard() {
                                     </div>
 
                                     {/* Avatar */}
-                                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mr-4 flex-shrink-0">
+                                    <a
+                                        href={`https://whop.com/u/${user.whopId}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 mr-4 flex-shrink-0 hover:border-orange-500 transition-colors cursor-pointer"
+                                        title="View Whop Profile"
+                                    >
                                         {user.avatar ? (
                                             <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-500 text-xs bg-white/10">?</div>
                                         )}
-                                    </div>
+                                    </a>
 
                                     {/* User Info */}
                                     <div className="flex-grow grid grid-cols-6 items-center">
