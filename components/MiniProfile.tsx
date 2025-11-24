@@ -42,6 +42,14 @@ const BADGES = [
     { name: "First $100", threshold: 100, type: "earnings", icon: "💰" },
 ];
 
+// Helper for compact number formatting
+const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+        notation: "compact",
+        maximumFractionDigits: 1
+    }).format(num).toLowerCase();
+};
+
 export default function MiniProfile({ user, username }: MiniProfileProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -129,16 +137,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                 {/* Divider */}
                                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-// Helper for compact number formatting
-const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US', {
-        notation: "compact",
-        maximumFractionDigits: 1
-    }).format(num).toLowerCase();
-};
 
-export default function MiniProfile({ user, username }: MiniProfileProps) {
-    // ... (existing code)
 
                                 {/* Detailed Metrics Grid */}
                                 <div className="grid grid-cols-2 gap-2 mb-2">

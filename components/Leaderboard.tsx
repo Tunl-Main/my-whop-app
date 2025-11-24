@@ -43,6 +43,14 @@ interface User {
     achievements?: { icon: string; name: string }[];
 }
 
+// Helper for compact number formatting
+const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+        notation: "compact",
+        maximumFractionDigits: 1
+    }).format(num).toLowerCase();
+};
+
 export default function Leaderboard() {
     const [users, setUsers] = useState<User[]>([]);
     const [filter, setFilter] = useState<'week' | 'month' | 'all'>('week');
@@ -161,18 +169,9 @@ export default function Leaderboard() {
                                             </div>
                                         </div>
 
-// Helper for compact number formatting
-const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US', {
-                                            notation: "compact",
-                                        maximumFractionDigits: 1
-    }).format(num).toLowerCase();
-};
 
-                                        export default function Leaderboard() {
-    // ... (existing state and effects)
 
-    return (
+                                        return (
                                         // ... (existing JSX)
                                         <div className="col-span-2 text-right font-mono text-gray-300 flex items-center justify-end gap-2">
                                             <span className="text-lg">{formatNumber(user.metrics.views)}</span>
