@@ -40,6 +40,18 @@ async function debug() {
     } else {
         console.log("No users found.");
     }
+
+    // Test the actual function used by the API
+    console.log("\n--- Testing getUsers() function ---");
+    const { getUsers } = await import('../lib/db');
+    const users = await getUsers();
+    const user = users.find(u => u.id === 'user_0yihsRzkg6E0X' || u.whopId === 'user_0yihsRzkg6E0X');
+
+    if (user) {
+        console.log("Transformed User:", JSON.stringify(user, null, 2));
+    } else {
+        console.log("User not found in getUsers() result");
+    }
 }
 
 debug();

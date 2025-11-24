@@ -58,6 +58,8 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
     const linkedAccount = user.linkedAccounts && user.linkedAccounts.length > 0 ? user.linkedAccounts[0] : null;
     const isSyncing = user.metrics.total_posts === 0 && linkedAccount; // Simple heuristic for syncing
 
+    console.log("MiniProfile User Data (v1.1):", user);
+
     return (
         <div
             className="relative z-50 w-full max-w-md mx-auto mb-12 group"
@@ -206,6 +208,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                     )}
                 </AnimatePresence>
             </FrostedGlass>
+            <div className="text-center mt-2 text-[10px] text-gray-600">v1.1</div>
         </div>
     );
 }

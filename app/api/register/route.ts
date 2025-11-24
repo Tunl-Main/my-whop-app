@@ -38,7 +38,15 @@ export async function POST(request: Request) {
                 whopId: userId,
                 linkedAccounts: [],
                 avatar: avatar || "",
-                metrics: { views: 0, shares: 0 },
+                metrics: {
+                    views: 0,
+                    likes: 0,
+                    shares: 0,
+                    earnings: 0,
+                    avg_views: 0,
+                    avg_likes: 0,
+                    total_posts: 0
+                },
                 achievements: [],
                 otp,
                 otpExpires
