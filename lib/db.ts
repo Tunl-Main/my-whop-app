@@ -247,3 +247,96 @@ export async function getTopClips(limit: number = 10): Promise<Clip[]> {
     }
   }));
 }
+
+export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week'): Promise<User[]> {
+  // 1. Calculate start date based on range
+  let startDate: string | null = null;
+  const now = new Date();
+
+  if (range === 'week') {
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    startDate = weekAgo.toISOString();
+  } else if (range === 'month') {
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    startDate = monthAgo.toISOString();
+  }
+
+  // 2. Fetch Users
+  const { data: users, error: usersError } = await supabase
+    .from('users')
+    .select(`
+      *,
+      linked_accounts (*),
+      achievements (*)
+    `);
+
+  if (usersError) {
+    console.error('Error fetching users:', usersError);
+    return [];
+  }
+
+  // 3. Fetch Clips (filtered by date if needed)
+  let query = supabase
+    .from('clips')
+    .select('user_id, views, likes, posted_at');
+
+  if (startDate) {
+    query = query.gte('posted_at', startDate);
+  }
+
+  const { data: clips, error: clipsError } = await query;
+
+  if (clipsError) {
+    console.error('Error fetching clips:', clipsError);
+    return [];
+  }
+
+  // 4. Aggregate Metrics per User
+  const userMetrics = new Map<string, { views: number; likes: number; viral_clips: number }>();
+
+  clips?.forEach((clip: any) => {
+    const current = userMetrics.get(clip.user_id) || { views: 0, likes: 0, viral_clips: 0 };
+
+    current.views += clip.views || 0;
+    current.likes += clip.likes || 0;
+    if ((clip.views || 0) >= 100000) {
+      current.viral_clips += 1;
+    }
+
+    userMetrics.set(clip.user_id, current);
+  });
+
+  // 5. Transform and Merge Data
+  return users.map((row: any) => {
+    const metrics = userMetrics.get(row.id) || { views: 0, likes: 0, viral_clips: 0 };
+
+    return {
+      id: row.id,
+      whopId: row.whop_id,
+      avatar: row.avatar,
+      otp: row.otp,
+      otpExpires: row.otp_expires,
+      linkedAccounts: row.linked_accounts?.map((acc: any) => ({
+        platform: acc.platform,
+        handle: acc.handle,
+        id: acc.platform_user_id
+      })) || [],
+      metrics: {
+        views: metrics.views,
+        likes: metrics.likes,
+        shares: 0, // Not tracked in clips yet
+        earnings: 0, // Not tracked in clips yet
+        viral_clips: metrics.viral_clips,
+        avg_views: 0, // Could calculate if needed
+        avg_likes: 0,
+        total_posts: 0
+      },
+      achievements: row.achievements?.map((ach: any) => ({
+        id: ach.achievement_id,
+        name: ach.name,
+        icon: ach.icon,
+        date: ach.date
+      })) || []
+    };
+  });
+}
