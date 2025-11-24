@@ -37,8 +37,8 @@ async function backfill() {
             console.log(`Updating metrics for user ${user.id} (${account.platform}: @${account.handle})...`);
 
             try {
-                // Trigger deep scrape (limit 50 for backfill)
-                await updateUserMetrics(user.id, account.platform, account.handle, 50);
+                // Trigger deep scrape (limit 1000 for backfill to capture viral clips)
+                await updateUserMetrics(user.id, account.platform, account.handle, 1000);
                 console.log(`Success for ${user.id}`);
             } catch (e) {
                 console.error(`Failed to update ${user.id}:`, e);

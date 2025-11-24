@@ -129,29 +129,44 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                 {/* Divider */}
                                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
+// Helper for compact number formatting
+const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+        notation: "compact",
+        maximumFractionDigits: 1
+    }).format(num).toLowerCase();
+};
+
+export default function MiniProfile({ user, username }: MiniProfileProps) {
+    // ... (existing code)
+
                                 {/* Detailed Metrics Grid */}
                                 <div className="grid grid-cols-2 gap-2 mb-2">
                                     <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
                                         <p className="text-[10px] text-gray-500 uppercase">Total Views</p>
-                                        <p className="text-white font-mono text-sm">{(user.metrics.views || 0).toLocaleString()}</p>
+                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.views || 0)}</p>
                                     </div>
                                     <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
                                         <p className="text-[10px] text-gray-500 uppercase">Total Likes</p>
-                                        <p className="text-white font-mono text-sm">{(user.metrics.likes || 0).toLocaleString()}</p>
+                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.likes || 0)}</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2">
                                     <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
                                         <p className="text-[10px] text-gray-500 uppercase">Avg Views</p>
-                                        <p className="text-white font-mono text-sm">{(user.metrics.avg_views || 0).toLocaleString()}</p>
+                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.avg_views || 0)}</p>
                                     </div>
                                     <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
                                         <p className="text-[10px] text-gray-500 uppercase">Avg Likes</p>
-                                        <p className="text-white font-mono text-sm">{(user.metrics.avg_likes || 0).toLocaleString()}</p>
+                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.avg_likes || 0)}</p>
                                     </div>
                                     <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
                                         <p className="text-[10px] text-gray-500 uppercase">Posts</p>
-                                        <p className="text-white font-mono text-sm">{(user.metrics.total_posts || 0).toLocaleString()}</p>
+                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.total_posts || 0)}</p>
+                                    </div>
+                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5 col-span-3 mt-1">
+                                        <p className="text-[10px] text-gray-500 uppercase text-orange-400">Viral Clips (>100k)</p>
+                                        <p className="text-white font-mono text-sm font-bold">{formatNumber(user.metrics.viral_clips || 0)}</p>
                                     </div>
                                 </div>
 
@@ -209,6 +224,6 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                 </AnimatePresence>
             </FrostedGlass>
             <div className="text-center mt-2 text-[10px] text-gray-600">v1.1</div>
-        </div>
+        </div >
     );
 }

@@ -28,9 +28,10 @@ create table metrics (
   shares bigint default 0,
   earnings bigint default 0,
   avg_views bigint default 0,
-  avg_likes bigint default 0,
-  total_posts bigint default 0,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  avg_likes BIGINT DEFAULT 0,
+  total_posts INTEGER DEFAULT 0,
+  viral_clips INTEGER DEFAULT 0,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) not null,
   unique(user_id)
 );
 

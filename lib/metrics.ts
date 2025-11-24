@@ -20,6 +20,9 @@ export async function updateUserMetrics(userId: string, platform: string, handle
     const avgViews = postCount > 0 ? Math.round(recentViews / postCount) : 0;
     const avgLikes = postCount > 0 ? Math.round(recentLikes / postCount) : 0;
 
+    // Calculate viral clips (posts with > 100k views)
+    const viralClips = metrics.recentPosts.filter(post => post.views >= 100000).length;
+
     // 1. Update Metrics Table
     const { data: existingMetrics } = await supabase
         .from('metrics')
@@ -38,6 +41,7 @@ export async function updateUserMetrics(userId: string, platform: string, handle
             avg_views: avgViews,
             avg_likes: avgLikes,
             total_posts: metrics.postsCount || metrics.recentPosts.length, // Fallback to fetched count
+            viral_clips: viralClips, // Add viral_clips
             updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
 

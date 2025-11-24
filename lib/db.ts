@@ -23,9 +23,10 @@ export interface User {
     likes: number;
     shares: number;
     earnings?: number;
-    avg_views: number;
-    avg_likes: number;
-    total_posts: number;
+    avg_views?: number;
+    avg_likes?: number;
+    total_posts?: number;
+    viral_clips?: number;
   };
   achievements: Achievement[];
   otp?: string;
@@ -53,6 +54,7 @@ function transformUser(row: any): User {
       avg_views: Array.isArray(row.metrics) ? (row.metrics[0]?.avg_views || 0) : (row.metrics?.avg_views || 0),
       avg_likes: Array.isArray(row.metrics) ? (row.metrics[0]?.avg_likes || 0) : (row.metrics?.avg_likes || 0),
       total_posts: Array.isArray(row.metrics) ? (row.metrics[0]?.total_posts || 0) : (row.metrics?.total_posts || 0),
+      viral_clips: Array.isArray(row.metrics) ? (row.metrics[0]?.viral_clips || 0) : (row.metrics?.viral_clips || 0),
     },
     achievements: row.achievements?.map((ach: any) => ({
       id: ach.achievement_id,

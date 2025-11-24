@@ -151,21 +151,41 @@ export default function Leaderboard() {
                                                         <span>{acc.platform}</span>
                                                     </div>
                                                 ))}
+                                                {/* Viral Clips Badge */}
+                                                {(user.metrics.viral_clips || 0) > 0 && (
+                                                    <div className="flex items-center gap-1 text-xs text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded-md border border-orange-500/20">
+                                                        <span className="font-bold">🔥 {user.metrics.viral_clips}</span>
+                                                        <span className="hidden sm:inline">Viral</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
+// Helper for compact number formatting
+const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+                                            notation: "compact",
+                                        maximumFractionDigits: 1
+    }).format(num).toLowerCase();
+};
+
+                                        export default function Leaderboard() {
+    // ... (existing state and effects)
+
+    return (
+                                        // ... (existing JSX)
                                         <div className="col-span-2 text-right font-mono text-gray-300 flex items-center justify-end gap-2">
-                                            <span className="text-lg">{user.metrics.views.toLocaleString()}</span>
+                                            <span className="text-lg">{formatNumber(user.metrics.views)}</span>
                                             <Eye className="w-4 h-4 text-gray-600 group-hover:text-orange-400 transition-colors" />
                                         </div>
 
                                         <div className="col-span-1 text-right font-mono text-gray-300 flex items-center justify-end gap-2">
-                                            <span className="text-lg">{user.metrics.likes.toLocaleString()}</span>
+                                            <span className="text-lg">{formatNumber(user.metrics.likes)}</span>
                                             <span className="text-xs text-gray-500">Likes</span>
                                         </div>
 
                                         <div className="col-span-1 text-right font-mono font-bold text-orange-400 flex items-center justify-end gap-1 text-lg">
-                                            ${user.metrics.earnings?.toLocaleString() || 0}
+                                            ${formatNumber(user.metrics.earnings || 0)}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -175,22 +195,32 @@ export default function Leaderboard() {
                         <TopClips />
                     )}
                 </div>
-
-                {/* Sidebar */}
-                <div className="lg:col-span-1 space-y-8">
-                    <RisingStars />
-
-                    {/* Mini Stats Widget */}
-                    <div className="p-6 rounded-2xl bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-white/10">
-                        <h3 className="text-white font-bold mb-2">Weekly Challenge</h3>
-                        <p className="text-sm text-gray-300 mb-4">Get 10k views on a single clip to unlock the "Viral" badge.</p>
-                        <div className="w-full bg-black/30 rounded-full h-2">
-                            <div className="bg-orange-500 h-2 rounded-full w-3/4" />
-                        </div>
-                        <p className="text-xs text-right text-gray-400 mt-1">75% Complete</p>
-                    </div>
-                </div>
+// ...
             </div>
-        </div>
+        </motion.div>
+    ))
+}
+                        </div >
+                    ) : (
+    <TopClips />
+)}
+                </div >
+
+    {/* Sidebar */ }
+    < div className = "lg:col-span-1 space-y-8" >
+        <RisingStars />
+
+{/* Mini Stats Widget */ }
+<div className="p-6 rounded-2xl bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-white/10">
+    <h3 className="text-white font-bold mb-2">Weekly Challenge</h3>
+    <p className="text-sm text-gray-300 mb-4">Get 10k views on a single clip to unlock the "Viral" badge.</p>
+    <div className="w-full bg-black/30 rounded-full h-2">
+        <div className="bg-orange-500 h-2 rounded-full w-3/4" />
+    </div>
+    <p className="text-xs text-right text-gray-400 mt-1">75% Complete</p>
+</div>
+                </div >
+            </div >
+        </div >
     );
 }

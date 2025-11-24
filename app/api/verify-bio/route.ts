@@ -60,9 +60,9 @@ export async function POST(request: Request) {
 
         // 5. Trigger Deep Scrape (Background)
         // We do NOT await this, so the UI returns immediately
-        // This will fetch up to 100 posts (or whatever limit we set)
-        console.log("Triggering background deep scrape...");
-        updateUserMetrics(dbUserId, platform, handle, 100).catch(err =>
+        // This will fetch up to 1000 posts (effectively "all" for most users)
+        console.log("Triggering background deep scrape (limit: 1000)...");
+        updateUserMetrics(dbUserId, platform, handle, 1000).catch(err =>
             console.error("Background deep scrape error:", err)
         );
 
