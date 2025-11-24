@@ -57,11 +57,17 @@ export default function Leaderboard() {
     const [filter, setFilter] = useState<'week' | 'month' | 'all'>('week');
     const [view, setView] = useState<'creators' | 'clips'>('creators');
 
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
-        fetch('/api/leaderboard')
+        setLoading(true);
+        fetch(`/api/leaderboard?range=${filter}`)
             .then(res => res.json())
-            .then(data => setUsers(data));
-    }, []);
+            .then(data => {
+                setUsers(data);
+                setLoading(false);
+            });
+    }, [filter]);
 
     return (
         <div className="w-full max-w-6xl mx-auto">
