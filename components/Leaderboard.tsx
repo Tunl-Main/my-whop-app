@@ -195,18 +195,22 @@ export default function Leaderboard() {
                                             </div>
                                         </div>
 
-                                        <div className="col-span-2 text-right font-mono text-gray-300 flex items-center justify-end gap-2">
-                                            <span className="text-lg">{formatNumber(user.metrics.views)}</span>
-                                            <Eye className="w-4 h-4 text-gray-600 group-hover:text-orange-400 transition-colors" />
+                                        <div className="col-span-2 flex flex-col items-end justify-center pr-2">
+                                            <span className="text-2xl font-bold text-white tracking-tight">{formatNumber(user.metrics.views)}</span>
+                                            <div className="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase tracking-wider group-hover:text-gray-400 transition-colors">
+                                                <Eye className="w-3 h-3" />
+                                                <span>Views</span>
+                                            </div>
                                         </div>
 
-                                        <div className="col-span-1 text-right font-mono text-gray-300 flex items-center justify-end gap-2">
-                                            <span className="text-lg">{formatNumber(user.metrics.likes)}</span>
-                                            <span className="text-xs text-gray-500">Likes</span>
+                                        <div className="col-span-1 flex flex-col items-end justify-center">
+                                            <span className="text-xl font-bold text-gray-300 tracking-tight">{formatNumber(user.metrics.likes)}</span>
+                                            <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">Likes</span>
                                         </div>
 
-                                        <div className="col-span-1 text-right font-mono font-bold text-orange-400 flex items-center justify-end gap-1 text-lg">
-                                            ${formatNumber(user.metrics.earnings || 0)}
+                                        <div className="col-span-1 flex flex-col items-end justify-center">
+                                            <span className="text-xl font-bold text-orange-400 tracking-tight">${formatNumber(user.metrics.earnings || 0)}</span>
+                                            <span className="text-xs font-medium text-orange-500/50 uppercase tracking-wider">Earned</span>
                                         </div>
                                     </div>
                                 </motion.div>
