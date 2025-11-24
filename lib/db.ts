@@ -224,7 +224,11 @@ export async function getTopClips(limit: number = 10): Promise<Clip[]> {
       *,
       users (
         whop_id,
-        avatar
+        avatar,
+        linked_accounts (
+          platform,
+          handle
+        )
       )
     `)
     .order('views', { ascending: false })
@@ -235,17 +239,27 @@ export async function getTopClips(limit: number = 10): Promise<Clip[]> {
     return [];
   }
 
-  return data.map((row: any) => ({
-    id: row.id,
-    thumbnail: row.thumbnail || '',
-    views: row.views,
-    likes: row.likes,
-    url: row.url,
-    creator: {
-      username: row.users?.whop_id || 'Unknown', // Using whop_id as username for now
-      avatar: row.users?.avatar || ''
-    }
-  }));
+  return data.map((row: any) => {
+    // Find the linked account that matches the clip's platform
+    const linkedAccount = row.users?.linked_accounts?.find(
+      (acc: any) => acc.platform === row.platform
+    );
+
+    // Fallback to first linked account or whop_id if no match
+    const username = linkedAccount?.handle || row.users?.linked_accounts?.[0]?.handle || row.users?.whop_id || 'Unknown';
+
+    return {
+      id: row.id,
+      thumbnail: row.thumbnail || '',
+      views: row.views,
+      likes: row.likes,
+      url: row.url,
+      creator: {
+        username: username,
+        avatar: row.users?.avatar || ''
+      }
+    };
+  });
 }
 
 export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week'): Promise<User[]> {
