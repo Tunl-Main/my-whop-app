@@ -50,6 +50,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'metrics' AND column_name = 'total_posts') THEN
         ALTER TABLE metrics ADD COLUMN total_posts bigint default 0;
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'metrics' AND column_name = 'viral_clips') THEN
+        ALTER TABLE metrics ADD COLUMN viral_clips bigint default 0;
+    END IF;
 END $$;
 
 -- 4. Clips (Individual Videos)

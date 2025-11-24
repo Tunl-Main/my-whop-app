@@ -164,7 +164,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                         <p className="text-white font-mono text-sm">{formatNumber(user.metrics.total_posts || 0)}</p>
                                     </div>
                                     <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5 col-span-3 mt-1">
-                                        <p className="text-[10px] text-gray-500 uppercase text-orange-400">Viral Clips (>100k)</p>
+                                        <p className="text-[10px] text-gray-500 uppercase text-orange-400">Viral Clips (&gt;100k)</p>
                                         <p className="text-white font-mono text-sm font-bold">{formatNumber(user.metrics.viral_clips || 0)}</p>
                                     </div>
                                 </div>
