@@ -3,6 +3,7 @@
 CREATE TABLE IF NOT EXISTS users (
   id text primary key,
   whop_id text unique not null,
+  username text,
   avatar text,
   otp text,
   otp_expires bigint,

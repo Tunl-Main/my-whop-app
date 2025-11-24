@@ -16,6 +16,7 @@ export interface Achievement {
 export interface User {
   id: string;
   whopId: string;
+  username?: string;
   linkedAccounts: LinkedAccount[];
   avatar?: string;
   metrics: {
@@ -38,6 +39,7 @@ function transformUser(row: any): User {
   return {
     id: row.id,
     whopId: row.whop_id,
+    username: row.username,
     avatar: row.avatar,
     otp: row.otp,
     otpExpires: row.otp_expires,
@@ -122,6 +124,7 @@ export async function createUser(user: User) {
     .insert({
       id: user.id,
       whop_id: user.whopId,
+      username: user.username,
       avatar: user.avatar,
       otp: user.otp,
       otp_expires: user.otpExpires
@@ -217,13 +220,14 @@ export interface Clip {
   };
 }
 
-export async function getTopClips(limit: number = 10): Promise<Clip[]> {
-  const { data, error } = await supabase
+export async function getTopClips(limit: number = 10, range: 'week' | 'month' | 'all' = 'all'): Promise<Clip[]> {
+  let query = supabase
     .from('clips')
     .select(`
       *,
       users (
         whop_id,
+        username,
         avatar,
         linked_accounts (
           platform,
@@ -233,6 +237,16 @@ export async function getTopClips(limit: number = 10): Promise<Clip[]> {
     `)
     .order('views', { ascending: false })
     .limit(limit);
+
+  if (range === 'week') {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    query = query.gte('posted_at', weekAgo);
+  } else if (range === 'month') {
+    const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    query = query.gte('posted_at', monthAgo);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching clips:', error);
@@ -245,8 +259,8 @@ export async function getTopClips(limit: number = 10): Promise<Clip[]> {
       (acc: any) => acc.platform === row.platform
     );
 
-    // Fallback to first linked account or whop_id if no match
-    const username = linkedAccount?.handle || row.users?.linked_accounts?.[0]?.handle || row.users?.whop_id || 'Unknown';
+    // Prioritize stored username, then Whop ID, then fallback to linked account handle
+    const username = row.users?.username || row.users?.whop_id || linkedAccount?.handle || row.users?.linked_accounts?.[0]?.handle || 'Unknown';
 
     return {
       id: row.id,

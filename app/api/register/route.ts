@@ -36,6 +36,7 @@ export async function POST(request: Request) {
             user = {
                 id: crypto.randomUUID(),
                 whopId: userId,
+                username: username,
                 linkedAccounts: [],
                 avatar: avatar || "",
                 metrics: {

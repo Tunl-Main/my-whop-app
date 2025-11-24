@@ -21,6 +21,7 @@ export default function TopClips() {
     const [clips, setClips] = useState<Clip[]>([]);
     const [loading, setLoading] = useState(true);
     const [playingClipId, setPlayingClipId] = useState<string | null>(null);
+    const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week');
 
     const getEmbedUrl = (url: string) => {
         try {
@@ -43,8 +44,19 @@ export default function TopClips() {
         return null;
     };
 
+    const formatNumber = (num: number) => {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'm';
+        }
+        if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'k';
+        }
+        return num.toString();
+    };
+
     useEffect(() => {
-        fetch('/api/clips')
+        setLoading(true);
+        fetch(`/api/clips?range=${timeRange}`)
             .then(res => res.json())
             .then(data => {
                 setClips(data);
@@ -54,7 +66,7 @@ export default function TopClips() {
                 console.error("Error fetching clips:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [timeRange]);
 
     if (loading) {
         return <div className="text-center text-gray-500 py-12">Loading top clips...</div>;
@@ -67,9 +79,21 @@ export default function TopClips() {
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Top Clips
-                    <span className="ml-2 text-sm font-normal text-gray-400 bg-white/10 px-2 py-1 rounded-full">All Time</span>
-                </h2>
+                <h2 className="text-2xl font-bold text-white">Top Clips</h2>
+                <div className="flex bg-white/5 rounded-lg p-1 gap-1">
+                    {(['week', 'month', 'all'] as const).map((range) => (
+                        <button
+                            key={range}
+                            onClick={() => setTimeRange(range)}
+                            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${timeRange === range
+                                    ? 'bg-orange-500 text-white shadow-lg'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            {range === 'week' ? 'This Week' : range === 'month' ? 'This Month' : 'All Time'}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Top 3 Grid - Compact */}
@@ -137,11 +161,11 @@ export default function TopClips() {
                                         <div className="flex items-center justify-between text-[10px] font-medium text-white/90">
                                             <div className="flex items-center gap-1">
                                                 <Eye className="w-3 h-3 text-orange-400" />
-                                                {(clip.views / 1000).toFixed(1)}k
+                                                {formatNumber(clip.views)}
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <Heart className="w-3 h-3 text-pink-500" />
-                                                {(clip.likes / 1000).toFixed(1)}k
+                                                {formatNumber(clip.likes)}
                                             </div>
                                         </div>
                                     </div>
@@ -153,7 +177,7 @@ export default function TopClips() {
                                 href={clip.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="absolute top-2 right-2 z-30 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white/70 hover:text-white transition-colors shadow-lg"
+                                className="absolute top-2 right-2 z-30 p-1.5 bg-black/70 hover:bg-black/90 rounded-full text-white hover:text-orange-400 transition-colors shadow-lg"
                                 title="View original"
                                 onClick={(e) => e.stopPropagation()}
                             >
@@ -205,10 +229,10 @@ export default function TopClips() {
                                         </div>
                                     </div>
                                     <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
-                                        {(clip.views / 1000).toFixed(1)}k
+                                        {formatNumber(clip.views)}
                                     </div>
                                     <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
-                                        {(clip.likes / 1000).toFixed(1)}k
+                                        {formatNumber(clip.likes)}
                                     </div>
                                 </div>
 
