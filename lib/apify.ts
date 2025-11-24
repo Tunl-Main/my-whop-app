@@ -26,17 +26,43 @@ export interface SocialMetrics {
 export async function scrapeInstagramProfile(username: string, limit: number = 12): Promise<SocialMetrics | null> {
     const cleanUsername = username.replace(/^@/, '');
     try {
+        // 1. Scrape Posts
+        console.log(`Scraping posts for ${cleanUsername} with limit ${limit}...`);
         const run = await client.actor(INSTAGRAM_SCRAPER_ID).call({
             directUrls: [`https://www.instagram.com/${cleanUsername}/`],
             resultsLimit: limit,
+            resultsType: 'posts', // Explicitly request posts
         });
 
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
         console.log(`Apify returned ${items?.length} items for ${username}`);
-        if (!items || items.length === 0) return null;
 
-        // Find profile info (must have biography or followersCount)
-        const profile = items.find((item: any) => item.biography !== undefined || item.followersCount !== undefined);
+        if (!items || items.length === 0) {
+            console.log("No items returned from posts scrape.");
+            return null;
+        }
+
+        // 2. Try to find profile info in the posts scrape
+        let profile = items.find((item: any) => item.biography !== undefined || item.followersCount !== undefined);
+
+        // 3. If profile missing, do a dedicated profile scrape
+        if (!profile) {
+            console.log("Profile info not found in posts scrape. Fetching details separately...");
+            try {
+                const profileRun = await client.actor(INSTAGRAM_SCRAPER_ID).call({
+                    directUrls: [`https://www.instagram.com/${cleanUsername}/`],
+                    resultsLimit: 1,
+                    resultsType: 'details', // Explicitly request details
+                });
+                const { items: profileItems } = await client.dataset(profileRun.defaultDatasetId).listItems();
+                profile = profileItems?.find((item: any) => item.biography !== undefined || item.followersCount !== undefined);
+
+                if (profile) console.log("✅ Fetched profile details successfully.");
+                else console.log("❌ Failed to fetch profile details in fallback.");
+            } catch (err) {
+                console.error("Error fetching profile details fallback:", err);
+            }
+        }
 
         const posts = items.filter((item: any) => (item.type === 'Post' || item.shortCode) && (profile ? item.id !== profile.id : true)).map((post: any) => ({
             url: `https://www.instagram.com/p/${post.shortCode || post.code}/`,

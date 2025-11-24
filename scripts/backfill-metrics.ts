@@ -1,8 +1,7 @@
-
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
-import { updateUserMetrics } from '../lib/metrics';
 
+// Load env vars BEFORE importing anything that uses them
 dotenv.config({ path: '.env.development.local' });
 
 const supabase = createClient(
@@ -12,6 +11,9 @@ const supabase = createClient(
 
 async function backfill() {
     console.log("Starting backfill...");
+
+    // Dynamically import metrics to ensure env vars are loaded first
+    const { updateUserMetrics } = await import('../lib/metrics');
 
     // 1. Get all users with linked accounts
     const { data: users, error } = await supabase

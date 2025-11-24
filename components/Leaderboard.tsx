@@ -154,12 +154,31 @@ export default function Leaderboard() {
                                             </div>
 
                                             <div className="flex items-center gap-2 mt-1">
-                                                {user.linkedAccounts?.map((acc, i) => (
-                                                    <div key={i} className="flex items-center gap-1 text-xs text-gray-500 bg-white/5 px-1.5 py-0.5 rounded-md">
-                                                        {getPlatformIcon(acc.platform)}
-                                                        <span>{acc.platform}</span>
-                                                    </div>
-                                                ))}
+                                                {user.linkedAccounts?.map((acc, i) => {
+                                                    const getPlatformUrl = (platform: string, handle: string) => {
+                                                        const cleanHandle = handle.replace(/^@/, '');
+                                                        switch (platform) {
+                                                            case 'instagram': return `https://instagram.com/${cleanHandle}`;
+                                                            case 'tiktok': return `https://tiktok.com/@${cleanHandle}`;
+                                                            case 'youtube': return `https://youtube.com/@${cleanHandle}`;
+                                                            case 'twitter': return `https://twitter.com/${cleanHandle}`;
+                                                            default: return '#';
+                                                        }
+                                                    };
+
+                                                    return (
+                                                        <a
+                                                            key={i}
+                                                            href={getPlatformUrl(acc.platform, acc.handle)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-1 text-xs text-gray-500 bg-white/5 px-1.5 py-0.5 rounded-md hover:bg-white/10 hover:text-orange-400 transition-colors"
+                                                        >
+                                                            {getPlatformIcon(acc.platform)}
+                                                            <span>{acc.platform}</span>
+                                                        </a>
+                                                    );
+                                                })}
                                                 {/* Viral Clips Badge */}
                                                 {(user.metrics.viral_clips || 0) > 0 && (
                                                     <div className="flex items-center gap-1 text-xs text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded-md border border-orange-500/20">
