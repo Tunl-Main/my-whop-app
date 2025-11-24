@@ -20,6 +20,28 @@ import { useState, useEffect } from "react";
 export default function TopClips() {
     const [clips, setClips] = useState<Clip[]>([]);
     const [loading, setLoading] = useState(true);
+    const [playingClipId, setPlayingClipId] = useState<string | null>(null);
+
+    const getEmbedUrl = (url: string) => {
+        try {
+            if (url.includes('instagram.com')) {
+                // Handle both /p/ and /reel/ URLs
+                const match = url.match(/instagram\.com\/(?:p|reel)\/([^/?#&]+)/);
+                if (match && match[1]) {
+                    return `https://www.instagram.com/p/${match[1]}/embed/captioned/`;
+                }
+            } else if (url.includes('tiktok.com')) {
+                // Extract video ID for TikTok
+                const match = url.match(/video\/(\d+)/);
+                if (match && match[1]) {
+                    return `https://www.tiktok.com/embed/v2/${match[1]}`;
+                }
+            }
+        } catch (e) {
+            console.error("Error parsing embed URL:", e);
+        }
+        return null;
+    };
 
     useEffect(() => {
         fetch('/api/clips')
@@ -52,60 +74,86 @@ export default function TopClips() {
 
             {/* Top 3 Grid - Compact */}
             <div className="grid grid-cols-3 gap-4 mb-8">
-                {clips.slice(0, 3).map((clip, index) => (
-                    <motion.a
-                        key={clip.id}
-                        href={clip.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="group relative aspect-[9/16] rounded-xl overflow-hidden bg-black/40 border border-white/10 hover:border-orange-500/50 transition-all hover:scale-[1.02] shadow-2xl"
-                    >
-                        {/* Rank Badge */}
-                        <div className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-orange-500 text-white font-bold text-xs shadow-lg">
-                            {index + 1}
+                {clips.slice(0, 3).map((clip, index) => {
+                    const isPlaying = playingClipId === clip.id;
+                    const embedUrl = getEmbedUrl(clip.url);
+
+                    return (
+                        <div
+                            key={clip.id}
+                            className="group relative aspect-[9/16] rounded-xl overflow-hidden bg-black/40 border border-white/10 hover:border-orange-500/50 transition-all hover:scale-[1.02] shadow-2xl"
+                        >
+                            {isPlaying && embedUrl ? (
+                                <iframe
+                                    src={embedUrl}
+                                    className="absolute inset-0 w-full h-full z-20"
+                                    frameBorder="0"
+                                    allowFullScreen
+                                    scrolling="no"
+                                />
+                            ) : (
+                                <>
+                                    {/* Rank Badge */}
+                                    <div className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-orange-500 text-white font-bold text-xs shadow-lg pointer-events-none">
+                                        {index + 1}
+                                    </div>
+
+                                    {/* Thumbnail */}
+                                    <img
+                                        src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=cover`}
+                                        alt="Clip thumbnail"
+                                        referrerPolicy="no-referrer"
+                                        className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        onClick={() => setPlayingClipId(clip.id)}
+                                    />
+
+                                    {/* Overlay Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+
+                                    {/* Play Button Overlay */}
+                                    <div
+                                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        onClick={() => setPlayingClipId(clip.id)}
+                                    >
+                                        <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20 backdrop-blur-sm">
+                                            <Play className="w-4 h-4 text-white fill-current ml-0.5" />
+                                        </div>
+                                    </div>
+
+                                    {/* Content Info */}
+                                    <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            <img src={clip.creator.avatar} className="w-5 h-5 rounded-full border border-white/20" referrerPolicy="no-referrer" />
+                                            <span className="text-xs font-medium text-white truncate">@{clip.creator.username}</span>
+                                        </div>
+
+                                        <div className="flex items-center justify-between text-[10px] font-medium text-white/90">
+                                            <div className="flex items-center gap-1">
+                                                <Eye className="w-3 h-3 text-orange-400" />
+                                                {(clip.views / 1000).toFixed(1)}k
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Heart className="w-3 h-3 text-pink-500" />
+                                                {(clip.likes / 1000).toFixed(1)}k
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* External Link (Always visible on hover) */}
+                            <a
+                                href={clip.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="absolute top-2 right-2 z-30 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white/70 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                title="View original"
+                            >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
                         </div>
-
-                        {/* Thumbnail */}
-                        <img
-                            src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=cover`}
-                            alt="Clip thumbnail"
-                            referrerPolicy="no-referrer"
-                            className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                        />
-
-                        {/* Overlay Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-
-                        {/* Play Button Overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20 backdrop-blur-sm">
-                                <Play className="w-4 h-4 text-white fill-current ml-0.5" />
-                            </div>
-                        </div>
-
-                        {/* Content Info */}
-                        <div className="absolute bottom-0 left-0 right-0 p-3">
-                            <div className="flex items-center gap-1.5 mb-2">
-                                <img src={clip.creator.avatar} className="w-5 h-5 rounded-full border border-white/20" referrerPolicy="no-referrer" />
-                                <span className="text-xs font-medium text-white truncate">@{clip.creator.username}</span>
-                            </div>
-
-                            <div className="flex items-center justify-between text-[10px] font-medium text-white/90">
-                                <div className="flex items-center gap-1">
-                                    <Eye className="w-3 h-3 text-orange-400" />
-                                    {(clip.views / 1000).toFixed(1)}k
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Heart className="w-3 h-3 text-pink-500" />
-                                    {(clip.likes / 1000).toFixed(1)}k
-                                </div>
-                            </div>
-                        </div>
-                    </motion.a>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Leaderboard List for Rest - Interactive */}
@@ -120,64 +168,80 @@ export default function TopClips() {
                     {clips.slice(3).length === 0 && (
                         <div className="p-8 text-center text-gray-500">More clips coming soon...</div>
                     )}
-                    {clips.slice(3).map((clip, index) => (
-                        <motion.a
-                            key={clip.id}
-                            href={clip.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group block relative overflow-hidden hover:bg-white/5 transition-colors"
-                            initial={false}
-                        >
-                            <div className="grid grid-cols-12 gap-4 p-4 items-center relative z-10">
-                                <div className="col-span-1 text-center font-bold text-gray-500 group-hover:text-white transition-colors">
-                                    {index + 4}
-                                </div>
-                                <div className="col-span-7 flex items-center gap-3">
-                                    {/* Small Thumbnail (always visible) */}
-                                    <img
-                                        src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=100&h=100&fit=cover`}
-                                        className="w-8 h-8 rounded-md object-cover opacity-50 group-hover:opacity-100 transition-opacity"
-                                        referrerPolicy="no-referrer"
-                                    />
+                    {clips.slice(3).map((clip, index) => {
+                        const isPlaying = playingClipId === clip.id;
+                        const embedUrl = getEmbedUrl(clip.url);
 
-                                    <div className="flex flex-col">
-                                        <span className="text-white font-medium text-sm truncate group-hover:text-orange-400 transition-colors">
-                                            Clip #{clip.id.slice(0, 8)}...
-                                        </span>
-                                        <span className="text-xs text-gray-400">@{clip.creator.username}</span>
+                        return (
+                            <div
+                                key={clip.id}
+                                className="group block relative overflow-hidden hover:bg-white/5 transition-colors"
+                            >
+                                <div className="grid grid-cols-12 gap-4 p-4 items-center relative z-10">
+                                    <div className="col-span-1 text-center font-bold text-gray-500 group-hover:text-white transition-colors">
+                                        {index + 4}
                                     </div>
-                                </div>
-                                <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
-                                    {(clip.views / 1000).toFixed(1)}k
-                                </div>
-                                <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
-                                    {(clip.likes / 1000).toFixed(1)}k
-                                </div>
-                            </div>
+                                    <div className="col-span-7 flex items-center gap-3">
+                                        {/* Small Thumbnail (always visible) */}
+                                        <img
+                                            src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=100&h=100&fit=cover`}
+                                            className="w-8 h-8 rounded-md object-cover opacity-50 group-hover:opacity-100 transition-opacity"
+                                            referrerPolicy="no-referrer"
+                                        />
 
-                            {/* Expanded Preview on Hover */}
-                            <div className="h-0 group-hover:h-48 transition-all duration-300 ease-out overflow-hidden bg-black/50">
-                                <div className="h-full w-full flex items-center justify-center relative">
-                                    <img
-                                        src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=cover`}
-                                        className="absolute inset-0 w-full h-full object-cover opacity-40 blur-sm"
-                                        referrerPolicy="no-referrer"
-                                    />
-                                    <img
-                                        src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=contain`}
-                                        className="relative h-full object-contain z-10 shadow-xl"
-                                        referrerPolicy="no-referrer"
-                                    />
-                                    <div className="absolute inset-0 flex items-center justify-center z-20">
-                                        <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer">
-                                            <Play className="w-5 h-5 text-white fill-current ml-1" />
+                                        <div className="flex flex-col">
+                                            <a href={clip.url} target="_blank" rel="noopener noreferrer" className="text-white font-medium text-sm truncate group-hover:text-orange-400 transition-colors hover:underline">
+                                                Clip #{clip.id.slice(0, 8)}...
+                                            </a>
+                                            <span className="text-xs text-gray-400">@{clip.creator.username}</span>
                                         </div>
                                     </div>
+                                    <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
+                                        {(clip.views / 1000).toFixed(1)}k
+                                    </div>
+                                    <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
+                                        {(clip.likes / 1000).toFixed(1)}k
+                                    </div>
+                                </div>
+
+                                {/* Expanded Preview on Hover / Play */}
+                                <div className={`transition-all duration-300 ease-out overflow-hidden bg-black/50 ${isPlaying ? 'h-[500px]' : 'h-0 group-hover:h-48'}`}>
+                                    <div className="h-full w-full flex items-center justify-center relative">
+                                        {isPlaying && embedUrl ? (
+                                            <iframe
+                                                src={embedUrl}
+                                                className="w-full h-full max-w-[300px]"
+                                                frameBorder="0"
+                                                allowFullScreen
+                                            />
+                                        ) : (
+                                            <>
+                                                <img
+                                                    src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=cover`}
+                                                    className="absolute inset-0 w-full h-full object-cover opacity-40 blur-sm"
+                                                    referrerPolicy="no-referrer"
+                                                />
+                                                <img
+                                                    src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=contain`}
+                                                    className="relative h-full object-contain z-10 shadow-xl cursor-pointer"
+                                                    referrerPolicy="no-referrer"
+                                                    onClick={() => setPlayingClipId(clip.id)}
+                                                />
+                                                <div
+                                                    className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
+                                                    onClick={() => setPlayingClipId(clip.id)}
+                                                >
+                                                    <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                                                        <Play className="w-5 h-5 text-white fill-current ml-1" />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </motion.a>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
