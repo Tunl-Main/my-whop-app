@@ -131,7 +131,7 @@ export default function Registration({
     };
 
     return (
-        <div className="w-full max-w-md mx-auto mb-12">
+        <div className="w-full max-w-md">
             <FrostedGlass variant="premium" className="rounded-2xl p-6 text-center">
                 <h2 className="text-2xl font-bold text-white mb-2">Join the Leaderboard</h2>
                 <p className="text-gray-400 mb-6 text-sm">

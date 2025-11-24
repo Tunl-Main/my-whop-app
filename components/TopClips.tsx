@@ -86,8 +86,8 @@ export default function TopClips() {
                             key={range}
                             onClick={() => setTimeRange(range)}
                             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${timeRange === range
-                                    ? 'bg-orange-500 text-white shadow-lg'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                ? 'bg-orange-500 text-white shadow-lg'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
                                 }`}
                         >
                             {range === 'week' ? 'This Week' : range === 'month' ? 'This Month' : 'All Time'}
@@ -102,10 +102,19 @@ export default function TopClips() {
                     const isPlaying = playingClipId === clip.id;
                     const embedUrl = getEmbedUrl(clip.url);
 
+                    const getRankStyles = (index: number) => {
+                        switch (index) {
+                            case 0: return "border-yellow-500/50 shadow-[0_0_30px_-5px_rgba(234,179,8,0.3)]";
+                            case 1: return "border-gray-400/50 shadow-[0_0_30px_-5px_rgba(156,163,175,0.3)]";
+                            case 2: return "border-orange-700/50 shadow-[0_0_30px_-5px_rgba(194,65,12,0.3)]";
+                            default: return "border-white/10 hover:border-orange-500/50";
+                        }
+                    };
+
                     return (
                         <div
                             key={clip.id}
-                            className="group relative aspect-[9/16] rounded-xl overflow-hidden bg-black/40 border border-white/10 hover:border-orange-500/50 transition-all hover:scale-[1.02] shadow-2xl"
+                            className={`group relative aspect-[9/16] rounded-xl overflow-hidden bg-black/40 border transition-all hover:scale-[1.02] shadow-2xl ${getRankStyles(index)}`}
                         >
                             {isPlaying && embedUrl ? (
                                 <iframe

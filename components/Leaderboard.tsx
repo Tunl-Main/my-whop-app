@@ -126,7 +126,12 @@ export default function Leaderboard() {
                                     className={clsx(
                                         "relative flex items-center p-4 rounded-2xl border transition-all hover:scale-[1.01] group",
                                         index < 3
-                                            ? "bg-gradient-to-r from-white/10 to-white/5 border-white/20 shadow-xl"
+                                            ? clsx(
+                                                "bg-gradient-to-r from-white/10 to-white/5 shadow-xl",
+                                                index === 0 ? "border-yellow-500/50 shadow-[0_0_30px_-5px_rgba(234,179,8,0.3)]" :
+                                                    index === 1 ? "border-gray-400/50 shadow-[0_0_30px_-5px_rgba(156,163,175,0.3)]" :
+                                                        "border-orange-700/50 shadow-[0_0_30px_-5px_rgba(194,65,12,0.3)]"
+                                            )
                                             : "bg-white/5 border-white/5 hover:bg-white/10"
                                     )}
                                 >
