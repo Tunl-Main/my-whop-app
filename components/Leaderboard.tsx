@@ -195,7 +195,7 @@ export default function Leaderboard() {
                                                 {(user.metrics.viral_clips || 0) > 0 && (
                                                     <div className="flex items-center gap-1 text-xs text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded-md border border-orange-500/20">
                                                         <span className="font-bold">🔥 {user.metrics.viral_clips}</span>
-                                                        <span className="hidden sm:inline">Viral</span>
+                                                        <span className="hidden sm:inline">Viral Posts</span>
                                                     </div>
                                                 )}
                                             </div>
