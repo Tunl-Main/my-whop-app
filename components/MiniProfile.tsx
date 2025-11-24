@@ -26,6 +26,7 @@ interface User {
         avg_views?: number;
         avg_likes?: number;
         total_posts?: number;
+        viral_clips?: number;
     };
     achievements: Achievement[];
 }

@@ -39,6 +39,7 @@ interface User {
         likes: number;
         shares: number;
         earnings?: number;
+        viral_clips?: number;
     };
     achievements?: { icon: string; name: string }[];
 }
