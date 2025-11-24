@@ -25,8 +25,8 @@ export default function TopClips() {
     const getEmbedUrl = (url: string) => {
         try {
             if (url.includes('instagram.com')) {
-                // Handle both /p/ and /reel/ URLs
-                const match = url.match(/instagram\.com\/(?:p|reel)\/([^/?#&]+)/);
+                // Handle /p/, /reel/, /tv/ URLs
+                const match = url.match(/instagram\.com\/(?:p|reel|tv)\/([^/?#&]+)/);
                 if (match && match[1]) {
                     return `https://www.instagram.com/p/${match[1]}/embed/captioned/`;
                 }
@@ -89,6 +89,7 @@ export default function TopClips() {
                                     className="absolute inset-0 w-full h-full z-20"
                                     frameBorder="0"
                                     allowFullScreen
+                                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                                     scrolling="no"
                                 />
                             ) : (
@@ -104,7 +105,10 @@ export default function TopClips() {
                                         alt="Clip thumbnail"
                                         referrerPolicy="no-referrer"
                                         className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                        onClick={() => setPlayingClipId(clip.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setPlayingClipId(clip.id);
+                                        }}
                                     />
 
                                     {/* Overlay Gradient */}
@@ -113,7 +117,10 @@ export default function TopClips() {
                                     {/* Play Button Overlay */}
                                     <div
                                         className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                        onClick={() => setPlayingClipId(clip.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setPlayingClipId(clip.id);
+                                        }}
                                     >
                                         <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20 backdrop-blur-sm">
                                             <Play className="w-4 h-4 text-white fill-current ml-0.5" />
@@ -124,7 +131,7 @@ export default function TopClips() {
                                     <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
                                         <div className="flex items-center gap-1.5 mb-2">
                                             <img src={clip.creator.avatar} className="w-5 h-5 rounded-full border border-white/20" referrerPolicy="no-referrer" />
-                                            <span className="text-xs font-medium text-white truncate">@{clip.creator.username}</span>
+                                            <span className="text-xs font-medium text-white truncate">@{clip.creator.username.replace(/^@/, '')}</span>
                                         </div>
 
                                         <div className="flex items-center justify-between text-[10px] font-medium text-white/90">
@@ -141,13 +148,14 @@ export default function TopClips() {
                                 </>
                             )}
 
-                            {/* External Link (Always visible on hover) */}
+                            {/* External Link (Always visible) */}
                             <a
                                 href={clip.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="absolute top-2 right-2 z-30 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white/70 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                className="absolute top-2 right-2 z-30 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white/70 hover:text-white transition-colors shadow-lg"
                                 title="View original"
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                             </a>
@@ -193,7 +201,7 @@ export default function TopClips() {
                                             <a href={clip.url} target="_blank" rel="noopener noreferrer" className="text-white font-medium text-sm truncate group-hover:text-orange-400 transition-colors hover:underline">
                                                 Clip #{clip.id.slice(0, 8)}...
                                             </a>
-                                            <span className="text-xs text-gray-400">@{clip.creator.username}</span>
+                                            <span className="text-xs text-gray-400">@{clip.creator.username.replace(/^@/, '')}</span>
                                         </div>
                                     </div>
                                     <div className="col-span-2 text-right text-gray-300 font-mono group-hover:text-white">
@@ -213,6 +221,7 @@ export default function TopClips() {
                                                 className="w-full h-full max-w-[300px]"
                                                 frameBorder="0"
                                                 allowFullScreen
+                                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                                             />
                                         ) : (
                                             <>
@@ -225,11 +234,17 @@ export default function TopClips() {
                                                     src={`https://images.weserv.nl/?url=${encodeURIComponent(clip.thumbnail)}&w=400&h=700&fit=contain`}
                                                     className="relative h-full object-contain z-10 shadow-xl cursor-pointer"
                                                     referrerPolicy="no-referrer"
-                                                    onClick={() => setPlayingClipId(clip.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPlayingClipId(clip.id);
+                                                    }}
                                                 />
                                                 <div
                                                     className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
-                                                    onClick={() => setPlayingClipId(clip.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPlayingClipId(clip.id);
+                                                    }}
                                                 >
                                                     <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                                                         <Play className="w-5 h-5 text-white fill-current ml-1" />
