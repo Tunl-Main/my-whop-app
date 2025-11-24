@@ -72,6 +72,7 @@ export default function TopClips() {
                         <img
                             src={clip.thumbnail}
                             alt="Clip thumbnail"
+                            referrerPolicy="no-referrer"
                             className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                         />
 
@@ -88,7 +89,7 @@ export default function TopClips() {
                         {/* Content Info */}
                         <div className="absolute bottom-0 left-0 right-0 p-3">
                             <div className="flex items-center gap-1.5 mb-2">
-                                <img src={clip.creator.avatar} className="w-5 h-5 rounded-full border border-white/20" />
+                                <img src={clip.creator.avatar} className="w-5 h-5 rounded-full border border-white/20" referrerPolicy="no-referrer" />
                                 <span className="text-xs font-medium text-white truncate">@{clip.creator.username}</span>
                             </div>
 
@@ -134,7 +135,7 @@ export default function TopClips() {
                                 </div>
                                 <div className="col-span-7 flex items-center gap-3">
                                     {/* Small Thumbnail (always visible) */}
-                                    <img src={clip.thumbnail} className="w-8 h-8 rounded-md object-cover opacity-50 group-hover:opacity-100 transition-opacity" />
+                                    <img src={clip.thumbnail} className="w-8 h-8 rounded-md object-cover opacity-50 group-hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
 
                                     <div className="flex flex-col">
                                         <span className="text-white font-medium text-sm truncate group-hover:text-orange-400 transition-colors">
@@ -154,8 +155,8 @@ export default function TopClips() {
                             {/* Expanded Preview on Hover */}
                             <div className="h-0 group-hover:h-48 transition-all duration-300 ease-out overflow-hidden bg-black/50">
                                 <div className="h-full w-full flex items-center justify-center relative">
-                                    <img src={clip.thumbnail} className="absolute inset-0 w-full h-full object-cover opacity-40 blur-sm" />
-                                    <img src={clip.thumbnail} className="relative h-full object-contain z-10 shadow-xl" />
+                                    <img src={clip.thumbnail} className="absolute inset-0 w-full h-full object-cover opacity-40 blur-sm" referrerPolicy="no-referrer" />
+                                    <img src={clip.thumbnail} className="relative h-full object-contain z-10 shadow-xl" referrerPolicy="no-referrer" />
                                     <div className="absolute inset-0 flex items-center justify-center z-20">
                                         <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer">
                                             <Play className="w-5 h-5 text-white fill-current ml-1" />
