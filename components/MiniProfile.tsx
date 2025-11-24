@@ -86,7 +86,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                         {linkedAccount && (
                             <p className="text-xs text-gray-400 font-medium flex items-center gap-1">
                                 <span className="capitalize text-orange-400">{linkedAccount.platform}</span>
-                                <span>@{linkedAccount.handle}</span>
+                                <span>{linkedAccount.handle.startsWith('@') ? linkedAccount.handle : `@${linkedAccount.handle}`}</span>
                                 {isSyncing && <span className="text-yellow-500 ml-2 animate-pulse">(Syncing...)</span>}
                             </p>
                         )}

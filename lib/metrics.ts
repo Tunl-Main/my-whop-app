@@ -37,23 +37,25 @@ export async function updateUserMetrics(userId: string, platform: string, handle
             earnings: existingMetrics?.earnings || 0,
             avg_views: avgViews,
             avg_likes: avgLikes,
-            total_posts: metrics.postsCount,
+            total_posts: metrics.postsCount || metrics.recentPosts.length, // Fallback to fetched count
             updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
 
     if (metricsError) console.error(`Error updating metrics for ${userId}:`, metricsError);
 
     // 2. Insert Metric Snapshot (for Rising Stars)
-    const { error: snapshotError } = await supabase
-        .from('metric_snapshots')
-        .insert({
-            user_id: userId,
-            views: recentViews,
-            followers: metrics.followers,
-            timestamp: new Date().toISOString()
-        });
+    if (metrics.followers !== undefined) {
+        const { error: snapshotError } = await supabase
+            .from('metric_snapshots')
+            .insert({
+                user_id: userId,
+                views: recentViews,
+                followers: metrics.followers,
+                timestamp: new Date().toISOString()
+            });
 
-    if (snapshotError) console.error(`Error inserting snapshot for ${userId}:`, snapshotError);
+        if (snapshotError) console.error(`Error inserting snapshot for ${userId}:`, snapshotError);
+    }
 
     // 3. Upsert Clips
     for (const post of metrics.recentPosts) {

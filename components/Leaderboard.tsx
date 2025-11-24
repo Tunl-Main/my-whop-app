@@ -36,6 +36,7 @@ interface User {
     avatar: string;
     metrics: {
         views: number;
+        likes: number;
         shares: number;
         earnings?: number;
     };
@@ -133,7 +134,7 @@ export default function Leaderboard() {
                                         <div className="col-span-2">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium text-white text-lg">
-                                                    @{user.linkedAccounts?.[0]?.handle || "Unknown"}
+                                                    {user.linkedAccounts?.[0]?.handle.startsWith('@') ? user.linkedAccounts[0].handle : `@${user.linkedAccounts?.[0]?.handle || "Unknown"}`}
                                                 </span>
                                                 {/* Achievements */}
                                                 {user.achievements?.map((ach, i) => (
@@ -159,8 +160,8 @@ export default function Leaderboard() {
                                         </div>
 
                                         <div className="col-span-1 text-right font-mono text-gray-300 flex items-center justify-end gap-2">
-                                            <span className="text-lg">{user.metrics.shares.toLocaleString()}</span>
-                                            <Share2 className="w-4 h-4 text-gray-600 group-hover:text-orange-400 transition-colors" />
+                                            <span className="text-lg">{user.metrics.likes.toLocaleString()}</span>
+                                            <span className="text-xs text-gray-500">Likes</span>
                                         </div>
 
                                         <div className="col-span-1 text-right font-mono font-bold text-orange-400 flex items-center justify-end gap-1 text-lg">

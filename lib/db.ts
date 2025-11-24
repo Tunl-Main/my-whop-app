@@ -20,8 +20,12 @@ export interface User {
   avatar?: string;
   metrics: {
     views: number;
+    likes: number;
     shares: number;
     earnings?: number;
+    avg_views: number;
+    avg_likes: number;
+    total_posts: number;
   };
   achievements: Achievement[];
   otp?: string;
@@ -42,9 +46,13 @@ function transformUser(row: any): User {
       id: acc.platform_user_id
     })) || [],
     metrics: {
-      views: row.metrics?.[0]?.views || 0,
-      shares: row.metrics?.[0]?.shares || 0,
-      earnings: row.metrics?.[0]?.earnings || 0,
+      views: Array.isArray(row.metrics) ? (row.metrics[0]?.views || 0) : (row.metrics?.views || 0),
+      likes: Array.isArray(row.metrics) ? (row.metrics[0]?.likes || 0) : (row.metrics?.likes || 0),
+      shares: Array.isArray(row.metrics) ? (row.metrics[0]?.shares || 0) : (row.metrics?.shares || 0),
+      earnings: Array.isArray(row.metrics) ? (row.metrics[0]?.earnings || 0) : (row.metrics?.earnings || 0),
+      avg_views: Array.isArray(row.metrics) ? (row.metrics[0]?.avg_views || 0) : (row.metrics?.avg_views || 0),
+      avg_likes: Array.isArray(row.metrics) ? (row.metrics[0]?.avg_likes || 0) : (row.metrics?.avg_likes || 0),
+      total_posts: Array.isArray(row.metrics) ? (row.metrics[0]?.total_posts || 0) : (row.metrics?.total_posts || 0),
     },
     achievements: row.achievements?.map((ach: any) => ({
       id: ach.achievement_id,

@@ -9,9 +9,9 @@ const INSTAGRAM_SCRAPER_ID = 'apify/instagram-scraper';
 const TIKTOK_SCRAPER_ID = 'clockworks/tiktok-scraper';
 
 export interface SocialMetrics {
-    followers: number;
-    following: number;
-    postsCount: number;
+    followers?: number;
+    following?: number;
+    postsCount?: number;
     bio?: string;
     recentPosts: {
         url: string;
@@ -24,21 +24,21 @@ export interface SocialMetrics {
 }
 
 export async function scrapeInstagramProfile(username: string, limit: number = 12): Promise<SocialMetrics | null> {
+    const cleanUsername = username.replace(/^@/, '');
     try {
         const run = await client.actor(INSTAGRAM_SCRAPER_ID).call({
-            directUrls: [`https://www.instagram.com/${username}/`],
+            directUrls: [`https://www.instagram.com/${cleanUsername}/`],
             resultsLimit: limit,
         });
 
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
+        console.log(`Apify returned ${items?.length} items for ${username}`);
         if (!items || items.length === 0) return null;
 
         // Find profile info (must have biography or followersCount)
         const profile = items.find((item: any) => item.biography !== undefined || item.followersCount !== undefined);
 
-        if (!profile) return null;
-
-        const posts = items.filter((item: any) => (item.type === 'Post' || item.shortCode) && item.id !== profile.id).map((post: any) => ({
+        const posts = items.filter((item: any) => (item.type === 'Post' || item.shortCode) && (profile ? item.id !== profile.id : true)).map((post: any) => ({
             url: `https://www.instagram.com/p/${post.shortCode || post.code}/`,
             thumbnail: post.displayUrl || post.thumbnailSrc,
             views: post.videoViewCount || 0,
@@ -46,12 +46,13 @@ export async function scrapeInstagramProfile(username: string, limit: number = 1
             comments: post.commentsCount || 0,
             postedAt: post.timestamp || new Date().toISOString(),
         }));
+        console.log(`Filtered ${posts.length} posts`);
 
         return {
-            followers: Number(profile.followersCount) || 0,
-            following: Number(profile.followsCount) || 0,
-            postsCount: Number(profile.postsCount) || 0,
-            bio: String(profile.biography || ""),
+            followers: profile ? (Number(profile.followersCount) || 0) : undefined,
+            following: profile ? (Number(profile.followsCount) || 0) : undefined,
+            postsCount: profile ? (Number(profile.postsCount) || 0) : undefined,
+            bio: profile ? String(profile.biography || "") : undefined,
             recentPosts: posts, // Return all fetched posts
         };
     } catch (error) {
