@@ -32,6 +32,7 @@ interface LinkedAccount {
 interface User {
     id: string;
     whopId: string;
+    username?: string;
     linkedAccounts: LinkedAccount[];
     avatar: string;
     metrics: {
@@ -54,8 +55,8 @@ const formatNumber = (num: number) => {
 
 // Leaderboard Row Component - Gaming Style
 const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
-    const handle = user.linkedAccounts?.[0]?.handle || "Unknown";
-    const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
+    // Use Whop username, fallback to whopId if no username
+    const displayName = user.username || user.whopId || "Unknown";
 
     // Orange theme glow for top 3, subtle for rest
     const getRankStyle = () => {
@@ -85,7 +86,7 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
 
             {/* Avatar */}
             <div className={clsx(
-                "w-11 h-11 rounded-full overflow-hidden mr-4 flex-shrink-0 transition-all",
+                "w-12 h-12 rounded-full overflow-hidden mr-4 flex-shrink-0 transition-all",
                 rank <= 3 
                     ? "ring-2 ring-orange-500/50 ring-offset-1 ring-offset-black" 
                     : "border border-gray-700"
@@ -100,8 +101,8 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
             {/* User Info */}
             <div className="flex-grow min-w-0">
                 <div className="flex items-center gap-2">
-                    <span className="font-semibold text-white truncate">
-                        {displayHandle}
+                    <span className="font-bold text-white text-lg truncate">
+                        {displayName}
                     </span>
                     {(user.metrics.viral_clips || 0) > 0 && (
                         <Flame className="w-4 h-4 text-orange-400" />
@@ -116,21 +117,19 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
                 </div>
             </div>
 
-            {/* Stats */}
-            <div className="flex items-center gap-6 text-right">
-                <div>
-                    <p className="font-bold text-white text-lg tabular-nums">
+            {/* Stats - Prominent */}
+            <div className="flex items-center gap-8">
+                <div className="text-right">
+                    <p className="font-black text-white text-2xl md:text-3xl tabular-nums tracking-tight">
                         {formatNumber(user.metrics.views)}
                     </p>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider flex items-center justify-end gap-1">
-                        <Eye className="w-3 h-3" /> Views
-                    </p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Views</p>
                 </div>
-                <div>
-                    <p className="font-bold text-white text-lg tabular-nums">
+                <div className="text-right">
+                    <p className="font-black text-white text-2xl md:text-3xl tabular-nums tracking-tight">
                         {formatNumber(user.metrics.likes)}
                     </p>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">Likes</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Likes</p>
                 </div>
             </div>
         </motion.div>

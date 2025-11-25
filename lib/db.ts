@@ -341,6 +341,7 @@ export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week
     return {
       id: row.id,
       whopId: row.whop_id,
+      username: row.username,
       avatar: row.avatar,
       otp: row.otp,
       otpExpires: row.otp_expires,
