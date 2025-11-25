@@ -41,22 +41,22 @@ export default async function ExperiencePage({
 					{/* Header Section */}
 					<div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-8">
 						{/* Logo Area (Top Left) */}
-						<div className="flex items-center gap-6">
+						<div className="flex items-center gap-3 sm:gap-6">
 							{/* Logo Image */}
 							<div className="relative flex-shrink-0">
 								<div className="absolute -inset-2 bg-orange-500/20 rounded-2xl blur-xl" />
 								<img 
 									src="/crown-logo.png" 
 									alt="Clipper Leaderboard" 
-									className="relative w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-[0_0_20px_rgba(249,115,22,0.4)]"
+									className="relative w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain drop-shadow-[0_0_20px_rgba(249,115,22,0.4)]"
 								/>
 							</div>
 							<div>
-								<h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)' }} className="font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
+								<h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 4.5rem)' }} className="font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
 									Clipper
 									<span className="block text-orange-500">Leaderboard</span>
 								</h1>
-								<p className="text-sm text-gray-400 mt-3 ml-1 font-semibold italic">
+								<p className="text-xs sm:text-sm text-gray-400 mt-2 sm:mt-3 ml-1 font-semibold italic hidden sm:block">
 									The #1 Clipping Leaderboard on the Internet
 								</p>
 							</div>
