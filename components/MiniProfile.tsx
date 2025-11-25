@@ -2,8 +2,24 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, ChevronDown, Eye, Heart, TrendingUp, Flame, DollarSign } from "lucide-react";
+import { ChevronDown, Eye, Heart, TrendingUp, Flame, Instagram, Youtube } from "lucide-react";
 import clsx from "clsx";
+
+// Custom TikTok Icon
+const TikTokIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
+    </svg>
+);
+
+const getPlatformIcon = (platform: string) => {
+    switch (platform) {
+        case 'instagram': return <Instagram className="w-4 h-4" />;
+        case 'tiktok': return <TikTokIcon className="w-4 h-4" />;
+        case 'youtube': return <Youtube className="w-4 h-4" />;
+        default: return null;
+    }
+};
 
 interface Achievement {
     id: string;
@@ -52,7 +68,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
         <div className="w-full max-w-sm">
             {/* Main Card */}
             <div 
-                className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden cursor-pointer group"
+                className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl border border-gray-800 overflow-hidden cursor-pointer group"
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 {/* Subtle glow effect on hover */}
@@ -73,7 +89,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                         alt="Avatar" 
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
+                            </div>
                             </div>
                         </div>
 
@@ -81,29 +97,30 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                         <div className="flex-grow min-w-0">
                             <h3 className="text-white font-bold text-lg truncate">{username}</h3>
                             {linkedAccount && (
-                                <p className="text-sm text-gray-400 truncate">
-                                    <span className="capitalize text-orange-400">{linkedAccount.platform}</span>
-                                    {' '}
-                                    <span className="text-gray-500">{linkedAccount.handle.startsWith('@') ? linkedAccount.handle : `@${linkedAccount.handle}`}</span>
-                                </p>
+                                <div className="flex items-center gap-1.5 text-gray-400 mt-0.5">
+                                    {getPlatformIcon(linkedAccount.platform)}
+                                    <span className="text-sm text-gray-500">
+                                        {linkedAccount.handle.startsWith('@') ? linkedAccount.handle : `@${linkedAccount.handle}`}
+                                    </span>
+                    </div>
                             )}
                             
-                            {/* Quick Stats Row */}
+                            {/* Key Stats Row - Views & Viral */}
                             <div className="flex items-center gap-4 mt-3">
-                                <div className="flex items-center gap-1.5">
-                                    <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center">
-                                        <Trophy className="w-3 h-3 text-orange-400" />
-                                    </div>
-                                    <span className="text-white font-semibold text-sm">{user.metrics.viral_clips || 0}</span>
-                                    <span className="text-gray-500 text-xs">viral clips</span>
+                                <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                                    <Eye className="w-3.5 h-3.5 text-blue-400" />
+                                    <span className="text-white font-bold text-sm">{formatNumber(user.metrics.views || 0)}</span>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                    <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                                        <DollarSign className="w-3 h-3 text-green-400" />
-                                    </div>
-                                    <span className="text-white font-semibold text-sm">${user.metrics.earnings || 0}</span>
-                                    <span className="text-gray-500 text-xs">earned</span>
+                                <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                                    <Heart className="w-3.5 h-3.5 text-pink-400" />
+                                    <span className="text-white font-bold text-sm">{formatNumber(user.metrics.likes || 0)}</span>
                                 </div>
+                                {(user.metrics.viral_clips || 0) > 0 && (
+                                    <div className="flex items-center gap-1.5 bg-orange-500/10 px-2.5 py-1 rounded-lg border border-orange-500/20">
+                                        <Flame className="w-3.5 h-3.5 text-orange-400" />
+                                        <span className="text-orange-400 font-bold text-sm">{user.metrics.viral_clips}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -129,30 +146,19 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                 {/* Divider */}
                                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
                                 
-                                {/* Total Stats Label */}
-                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Total stats</p>
-                                
                                 {/* Stats Grid */}
-                                <div className="grid grid-cols-5 gap-2">
-                                    <div className="text-center">
-                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.views || 0)}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase">Views</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.likes || 0)}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase">Likes</p>
-                                    </div>
-                                    <div className="text-center">
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
                                         <p className="text-white font-bold text-lg">{formatNumber(user.metrics.avg_views || 0)}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase">Avg Views</p>
+                                        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Avg Views</p>
                                     </div>
-                                    <div className="text-center">
+                                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
                                         <p className="text-white font-bold text-lg">{formatNumber(user.metrics.avg_likes || 0)}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase">Avg Likes</p>
+                                        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Avg Likes</p>
                                     </div>
-                                    <div className="text-center">
+                                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
                                         <p className="text-white font-bold text-lg">{formatNumber(user.metrics.total_posts || 0)}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase">Posts</p>
+                                        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Posts</p>
                                     </div>
                                 </div>
 
