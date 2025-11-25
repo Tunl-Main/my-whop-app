@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Eye, Heart, Flame, Link2, Settings } from "lucide-react";
+import { ChevronDown, Eye, Heart, Flame, Settings } from "lucide-react";
 import clsx from "clsx";
 
 // All supported platforms
@@ -117,6 +117,7 @@ interface User {
 interface MiniProfileProps {
     user: User;
     username: string;
+    onConnectAccount?: (platform: string) => void;
 }
 
 // Helper for compact number formatting
@@ -127,7 +128,7 @@ const formatNumber = (num: number) => {
     }).format(num);
 };
 
-export default function MiniProfile({ user, username }: MiniProfileProps) {
+export default function MiniProfile({ user, username, onConnectAccount }: MiniProfileProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showAccountsDropdown, setShowAccountsDropdown] = useState(false);
 
@@ -135,11 +136,9 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
     const connectedPlatforms = new Set(user.linkedAccounts?.map(acc => acc.platform) || []);
 
     const handleConnectAccount = (platform: string) => {
-        // This would trigger the account connection flow
-        // For now, we'll just log it - you'd integrate with your registration/verification flow
-        console.log(`Connect ${platform} account`);
-        // You could emit an event or call a callback prop here
-        alert(`To connect ${platform}, please follow the verification process.`);
+        if (onConnectAccount) {
+            onConnectAccount(platform);
+        }
     };
 
     return (
@@ -180,23 +179,27 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                 {ALL_PLATFORMS.map((platform) => {
                                     const isConnected = connectedPlatforms.has(platform);
                                     return (
-                                        <div 
+                                        <button 
                                             key={platform}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!isConnected) {
+                                                    handleConnectAccount(platform);
+                                                }
+                                            }}
                                             className={clsx(
                                                 "relative flex items-center justify-center w-7 h-7 rounded-lg transition-all",
                                                 isConnected 
                                                     ? "bg-white/10 border border-white/20" 
-                                                    : "bg-white/5 border border-white/5 opacity-40"
+                                                    : "bg-white/5 border border-white/5 opacity-40 hover:opacity-70 hover:border-orange-500/30 cursor-pointer"
                                             )}
-                                            title={isConnected ? `${platform} connected` : `${platform} not connected`}
+                                            title={isConnected ? `${platform} connected` : `Click to connect ${platform}`}
                                         >
                                             {isConnected ? getColoredIcon(platform, "w-4 h-4") : getGreyIcon(platform, "w-4 h-4 text-gray-600")}
                                             {isConnected && (
-                                                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full flex items-center justify-center border border-black">
-                                                    <Link2 className="w-2 h-2 text-white" />
-                                                </div>
+                                                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-black" />
                                             )}
-                                        </div>
+                                        </button>
                                     );
                                 })}
                     </div>
@@ -286,7 +289,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                                 className="overflow-hidden"
                                             >
                                                 <div className="mt-2 p-3 rounded-xl bg-black/40 border border-white/10 space-y-2">
-                                                    {ALL_PLATFORMS.map((platform) => {
+                                                {ALL_PLATFORMS.map((platform) => {
                                                         const isConnected = connectedPlatforms.has(platform);
                                                         const linkedAccount = user.linkedAccounts?.find(acc => acc.platform === platform);
                                                         
@@ -313,9 +316,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                                                                             : getGreyIcon(platform, "w-6 h-6 text-gray-600")
                                                                         }
                                                                         {isConnected && (
-                                                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-black">
-                                                                                <Link2 className="w-2.5 h-2.5 text-white" />
-                                                                            </div>
+                                                                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-black" />
                                                                         )}
                                                                     </div>
                                                                     <div>

@@ -55,8 +55,49 @@ export default function Registration({
         }
     }, [propUserId]);
 
+    const handleConnectNewAccount = (platform: string) => {
+        // Set the selected platform and open the bio verification modal
+        setSelectedPlatform(platform as typeof PLATFORMS[number]['id']);
+        setShowBioVerification(true);
+    };
+
     if (user && user.linkedAccounts && user.linkedAccounts.length > 0) {
-        return <MiniProfile user={user} username={propUsername || "User"} />;
+        return (
+            <>
+                <MiniProfile 
+                    user={user} 
+                    username={propUsername || "User"} 
+                    onConnectAccount={handleConnectNewAccount}
+                />
+                {/* Bio Verification Modal for connecting additional accounts */}
+                {showBioVerification && (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube' || selectedPlatform === 'instagram') && (
+                    <BioVerification
+                        isOpen={showBioVerification}
+                        onClose={() => setShowBioVerification(false)}
+                        platform={selectedPlatform}
+                        onVerify={async (handle: string, code: string) => {
+                            const userId = propUserId || "user_" + Math.floor(Math.random() * 10000);
+                            const res = await fetch("/api/verify-bio", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    userId,
+                                    username: propUsername,
+                                    avatar: propAvatar,
+                                    platform: selectedPlatform,
+                                    handle,
+                                    code
+                                }),
+                            });
+                            const data = await res.json();
+                            if (data.error) throw new Error(data.error);
+                            // Refresh user data to show updated linked accounts
+                            setUser(data.user);
+                        }}
+                    />
+                )}
+            </>
+        );
     }
 
     const handleConnect = async () => {
