@@ -34,7 +34,7 @@ export default function Page() {
 								/>
 							</div>
 							<div>
-								<h1 style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)' }} className="font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
+								<h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)' }} className="font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
 									Clipper
 									<span className="block text-orange-500">Leaderboard</span>
 								</h1>
