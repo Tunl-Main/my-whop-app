@@ -197,7 +197,10 @@ export default function MiniProfile({ user, username, onConnectAccount }: MiniPr
                                         >
                                             {isConnected ? getColoredIcon(platform, "w-4 h-4") : getGreyIcon(platform, "w-4 h-4 text-gray-600")}
                                             {isConnected && (
-                                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-gray-900 shadow-[0_0_4px_rgba(34,197,94,0.6)]" />
+                                                <div 
+                                                    className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full"
+                                                    style={{ backgroundColor: '#22c55e', border: '1px solid #111', boxShadow: '0 0 6px rgba(34,197,94,0.8)' }}
+                                                />
                                             )}
                                         </button>
                                     );
@@ -316,7 +319,10 @@ export default function MiniProfile({ user, username, onConnectAccount }: MiniPr
                                                                             : getGreyIcon(platform, "w-6 h-6 text-gray-600")
                                                                         }
                                                                         {isConnected && (
-                                                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border border-gray-900 shadow-[0_0_4px_rgba(34,197,94,0.6)]" />
+                                                                            <div 
+                                                                                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full"
+                                                                                style={{ backgroundColor: '#22c55e', border: '1px solid #111', boxShadow: '0 0 6px rgba(34,197,94,0.8)' }}
+                                                                            />
                                                                         )}
                                                                     </div>
                                                                     <div>
