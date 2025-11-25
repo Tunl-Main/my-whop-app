@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Instagram, Youtube, Twitter, Eye, Flame } from "lucide-react";
+import { Instagram, Youtube, Twitter, Eye, Flame, UserPlus, MessageCircle } from "lucide-react";
 import clsx from "clsx";
 import TopClips from "./TopClips";
 import RisingStars from "./RisingStars";
+import UserProfileModal from "./UserProfileModal";
 
 // Custom TikTok Icon
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -54,9 +55,10 @@ const formatNumber = (num: number) => {
 };
 
 // Leaderboard Row Component - Gaming Style
-const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
+const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number; onUserClick: (user: User) => void }) => {
     // Use Whop username, fallback to whopId if no username
     const displayName = user.username || user.whopId || "Unknown";
+    const whopProfileUrl = `https://whop.com/@${user.username || user.whopId}`;
 
     // Orange theme glow for top 3, subtle for rest
     const getRankStyle = () => {
@@ -64,13 +66,24 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
         return "from-transparent to-transparent border-gray-800/50 hover:border-gray-700";
     };
 
+    const handleFollow = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        window.open(whopProfileUrl, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleDM = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        window.open(whopProfileUrl, '_blank', 'noopener,noreferrer');
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: rank * 0.03 }}
+            onClick={() => onUserClick(user)}
             className={clsx(
-                "relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] group",
+                "relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] group cursor-pointer",
                 getRankStyle()
             )}
         >
@@ -117,6 +130,24 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
                 </div>
             </div>
 
+            {/* Inline Action Buttons - Show on hover */}
+            <div className="flex items-center gap-2 mr-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                    onClick={handleFollow}
+                    className="p-2 rounded-lg bg-orange-500/20 hover:bg-orange-500/40 text-orange-400 transition-colors"
+                    title="Follow on Whop"
+                >
+                    <UserPlus className="w-4 h-4" />
+                </button>
+                <button
+                    onClick={handleDM}
+                    className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 transition-colors"
+                    title="Message on Whop"
+                >
+                    <MessageCircle className="w-4 h-4" />
+                </button>
+            </div>
+
             {/* Stats - Prominent */}
             <div className="flex items-center gap-8">
                 <div className="text-right">
@@ -139,18 +170,31 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
 export default function Leaderboard() {
     const [users, setUsers] = useState<User[]>([]);
     const [filter, setFilter] = useState<'week' | 'month' | 'all'>('week');
-    const [view, setView] = useState<'creators' | 'clips'>('creators');
+    const [sortBy, setSortBy] = useState<'views' | 'likes' | 'earnings'>('views');
+    const [view, setView] = useState<'creators' | 'clips' | 'rising'>('creators');
     const [loading, setLoading] = useState(true);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleUserClick = (user: User) => {
+        setSelectedUser(user);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedUser(null);
+    };
 
     useEffect(() => {
         setLoading(true);
-        fetch(`/api/leaderboard?range=${filter}`)
+        fetch(`/api/leaderboard?range=${filter}&sortBy=${sortBy}`)
             .then(res => res.json())
             .then(data => {
                 setUsers(data);
                 setLoading(false);
             });
-    }, [filter]);
+    }, [filter, sortBy]);
 
     return (
         <div className="w-full">
@@ -163,85 +207,125 @@ export default function Leaderboard() {
                     {/* Tabs Row */}
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         {/* View Toggle */}
-                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                    <button
-                        onClick={() => setView('creators')}
-                        className={clsx(
+                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                            <button
+                                onClick={() => setView('creators')}
+                                className={clsx(
                                     "px-5 py-2 rounded-lg text-sm font-medium transition-all",
-                            view === 'creators' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
-                        )}
-                    >
-                        Clippers
-                    </button>
-                    <button
-                        onClick={() => setView('clips')}
-                        className={clsx(
+                                    view === 'creators' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                Clippers
+                            </button>
+                            <button
+                                onClick={() => setView('clips')}
+                                className={clsx(
                                     "px-5 py-2 rounded-lg text-sm font-medium transition-all",
-                            view === 'clips' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
-                        )}
-                    >
-                        Top Clips
-                    </button>
-                </div>
+                                    view === 'clips' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                Top Clips
+                            </button>
+                            <button
+                                onClick={() => setView('rising')}
+                                className={clsx(
+                                    "px-5 py-2 rounded-lg text-sm font-medium transition-all",
+                                    view === 'rising' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                Rising Stars
+                            </button>
+                        </div>
 
                         {/* Time Filter */}
                         <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
                             {(['week', 'month', 'all'] as const).map((f) => (
-                        <button
-                            key={f}
+                                <button
+                                    key={f}
                                     onClick={() => setFilter(f)}
-                            className={clsx(
+                                    className={clsx(
                                         "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                filter === f
+                                        filter === f
                                             ? "bg-white/10 text-white"
                                             : "text-gray-500 hover:text-gray-300"
-                            )}
-                        >
+                                    )}
+                                >
                                     {f === 'week' ? 'This Week' : f === 'month' ? 'This Month' : 'All Time'}
-                        </button>
-                    ))}
+                                </button>
+                            ))}
                         </div>
+                    </div>
+
+                    {/* Sort By Toggle - Only show for Clippers view */}
+                    {view === 'creators' && (
+                        <div className="flex justify-center mt-4">
+                            <div className="flex bg-white/5 p-1 rounded-lg border border-white/10 text-xs">
+                                <span className="px-2 py-1.5 text-gray-500 font-medium">Sort:</span>
+                                {(['views', 'likes', 'earnings'] as const).map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setSortBy(s)}
+                                        className={clsx(
+                                            "px-3 py-1.5 rounded-md font-medium transition-all capitalize",
+                                            sortBy === s
+                                                ? "bg-orange-500/20 text-orange-400"
+                                                : "text-gray-500 hover:text-gray-300"
+                                        )}
+                                    >
+                                        {s === 'earnings' ? '💰 Earnings' : s === 'views' ? '👁 Views' : '❤️ Likes'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </div>
 
                 {/* Content */}
                 <div className="p-6">
-                    {view === 'creators' ? (
+                    {view === 'creators' && (
                         <>
                             {/* Leaderboard Rows */}
                             <div className="space-y-3">
-                            {users.map((user, index) => (
-                                    <LeaderboardRow key={user.id} user={user} rank={index + 1} />
-                                                ))}
-                                            </div>
+                                {users.map((user, index) => (
+                                    <LeaderboardRow 
+                                        key={user.id} 
+                                        user={user} 
+                                        rank={index + 1} 
+                                        onUserClick={handleUserClick}
+                                    />
+                                ))}
+                            </div>
 
                             {users.length === 0 && !loading && (
                                 <div className="text-center py-12 text-gray-500">
                                     No clippers found for this time period.
-                                                    </div>
-                                                )}
+                                </div>
+                            )}
 
                             {loading && (
                                 <div className="text-center py-12 text-gray-500">
                                     Loading...
-                                            </div>
+                                </div>
                             )}
                         </>
-                    ) : (
+                    )}
+                    
+                    {view === 'clips' && (
                         <TopClips timeRange={filter} />
                     )}
-                </div>
-                </div>
-
-            {/* Sidebar Section - Rising Stars */}
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                    {/* Could add more content here */}
-                </div>
-                <div>
-                    <RisingStars />
+                    
+                    {view === 'rising' && (
+                        <RisingStars variant="full" />
+                    )}
                 </div>
             </div>
+
+            {/* User Profile Modal */}
+            <UserProfileModal 
+                user={selectedUser}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+            />
         </div>
     );
 }
