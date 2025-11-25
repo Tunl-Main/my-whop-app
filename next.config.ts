@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ hostname: "**" }],
   },
+  // Disable Turbopack to avoid bundling/caching differences
+  experimental: {
+    turbo: undefined, // Explicitly disable Turbo features
+  },
   async headers() {
     return [
       {
