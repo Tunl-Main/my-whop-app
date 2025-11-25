@@ -197,7 +197,7 @@ export default function MiniProfile({ user, username, onConnectAccount }: MiniPr
                                         >
                                             {isConnected ? getColoredIcon(platform, "w-4 h-4") : getGreyIcon(platform, "w-4 h-4 text-gray-600")}
                                             {isConnected && (
-                                                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-black" />
+                                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-gray-900 shadow-[0_0_4px_rgba(34,197,94,0.6)]" />
                                             )}
                                         </button>
                                     );
@@ -316,7 +316,7 @@ export default function MiniProfile({ user, username, onConnectAccount }: MiniPr
                                                                             : getGreyIcon(platform, "w-6 h-6 text-gray-600")
                                                                         }
                                                                         {isConnected && (
-                                                                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-black" />
+                                                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border border-gray-900 shadow-[0_0_4px_rgba(34,197,94,0.6)]" />
                                                                         )}
                                                                     </div>
                                                                     <div>
