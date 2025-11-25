@@ -57,12 +57,12 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
     const handle = user.linkedAccounts?.[0]?.handle || "Unknown";
     const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
 
-    // Special styling for top 3
+    // Special styling for top 3 - pronounced glowing borders
     const getRankStyle = () => {
-        if (rank === 1) return "from-yellow-500/20 to-yellow-500/5 border-yellow-500/40 shadow-[0_0_20px_-5px_rgba(234,179,8,0.3)]";
-        if (rank === 2) return "from-gray-400/20 to-gray-400/5 border-gray-400/40 shadow-[0_0_20px_-5px_rgba(156,163,175,0.3)]";
-        if (rank === 3) return "from-orange-600/20 to-orange-600/5 border-orange-600/40 shadow-[0_0_20px_-5px_rgba(234,88,12,0.3)]";
-        return "from-white/5 to-transparent border-white/10 hover:border-orange-500/30";
+        if (rank === 1) return "from-yellow-500/20 to-yellow-500/5 border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.5),0_0_60px_rgba(234,179,8,0.3),inset_0_0_20px_rgba(234,179,8,0.1)]";
+        if (rank === 2) return "from-gray-300/15 to-gray-400/5 border-gray-300 shadow-[0_0_30px_rgba(192,192,192,0.4),0_0_60px_rgba(192,192,192,0.2),inset_0_0_20px_rgba(192,192,192,0.1)]";
+        if (rank === 3) return "from-orange-600/20 to-orange-700/5 border-orange-500 shadow-[0_0_30px_rgba(205,127,50,0.5),0_0_60px_rgba(205,127,50,0.3),inset_0_0_20px_rgba(205,127,50,0.1)]";
+        return "from-white/[0.02] to-transparent border-gray-800 hover:border-gray-600";
     };
 
     const getRankBadgeStyle = () => {
