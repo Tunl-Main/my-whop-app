@@ -34,7 +34,7 @@ export default function Page() {
 								/>
 							</div>
 							<div>
-								<h1 className="text-7xl md:text-[10rem] font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
+								<h1 className="text-3xl md:text-4xl font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
 									Clipper
 									<span className="block text-orange-500">Leaderboard</span>
 								</h1>
