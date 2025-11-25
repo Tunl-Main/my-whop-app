@@ -34,10 +34,13 @@ export default function Page() {
 								/>
 							</div>
 							<div>
-								<h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
+								<h1 className="text-5xl md:text-6xl font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
 									Clipper
 									<span className="block text-orange-500">Leaderboard</span>
 								</h1>
+								<p className="text-sm text-gray-400 mt-3 ml-1 font-medium tracking-wide">
+									the #1 clipping leaderboard on the internet
+								</p>
 							</div>
 						</div>
 
