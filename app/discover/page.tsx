@@ -1,3 +1,7 @@
+// Force dynamic rendering - no caching at build time or CDN edge
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function DiscoverPage() {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">

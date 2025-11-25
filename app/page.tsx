@@ -1,6 +1,10 @@
 import Registration from "@/components/Registration";
 import Leaderboard from "@/components/Leaderboard";
 
+// Force dynamic rendering - no caching at build time or CDN edge
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function Page() {
 	return (
 		<div className="min-h-screen bg-black text-white selection:bg-blue-500/30">

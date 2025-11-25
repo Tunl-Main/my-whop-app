@@ -3,6 +3,10 @@ import { whopsdk } from "@/lib/whop-sdk";
 import Registration from "@/components/Registration";
 import Leaderboard from "@/components/Leaderboard";
 
+// Force dynamic rendering - no caching at build time or CDN edge
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ExperiencePage({
 	params,
 }: {

@@ -3,6 +3,10 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { whopsdk } from "@/lib/whop-sdk";
 
+// Force dynamic rendering - no caching at build time or CDN edge
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function DashboardPage({
 	params,
 }: {
