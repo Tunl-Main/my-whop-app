@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Instagram, Youtube, Twitter, Eye, Flame, Trophy } from "lucide-react";
+import { Instagram, Youtube, Twitter, Eye, Flame } from "lucide-react";
 import clsx from "clsx";
 import TopClips from "./TopClips";
 import RisingStars from "./RisingStars";
@@ -57,26 +57,10 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
     const handle = user.linkedAccounts?.[0]?.handle || "Unknown";
     const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
 
-    // Special styling for top 3 - pronounced glowing borders
+    // Orange theme glow for top 3, subtle for rest
     const getRankStyle = () => {
-        if (rank === 1) return "from-yellow-500/20 to-yellow-500/5 border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.5),0_0_60px_rgba(234,179,8,0.3),inset_0_0_20px_rgba(234,179,8,0.1)]";
-        if (rank === 2) return "from-gray-300/15 to-gray-400/5 border-gray-300 shadow-[0_0_30px_rgba(192,192,192,0.4),0_0_60px_rgba(192,192,192,0.2),inset_0_0_20px_rgba(192,192,192,0.1)]";
-        if (rank === 3) return "from-orange-600/20 to-orange-700/5 border-orange-500 shadow-[0_0_30px_rgba(205,127,50,0.5),0_0_60px_rgba(205,127,50,0.3),inset_0_0_20px_rgba(205,127,50,0.1)]";
-        return "from-white/[0.02] to-transparent border-gray-800 hover:border-gray-600";
-    };
-
-    const getRankBadgeStyle = () => {
-        if (rank === 1) return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-black shadow-lg shadow-yellow-500/30";
-        if (rank === 2) return "bg-gradient-to-br from-gray-300 to-gray-500 text-black shadow-lg shadow-gray-400/30";
-        if (rank === 3) return "bg-gradient-to-br from-orange-500 to-orange-700 text-white shadow-lg shadow-orange-500/30";
-        return "bg-white/10 text-gray-400";
-    };
-
-    const getAvatarRingStyle = () => {
-        if (rank === 1) return "ring-2 ring-yellow-500 ring-offset-2 ring-offset-black";
-        if (rank === 2) return "ring-2 ring-gray-400 ring-offset-2 ring-offset-black";
-        if (rank === 3) return "ring-2 ring-orange-500 ring-offset-2 ring-offset-black";
-        return "border-2 border-white/20";
+        if (rank <= 3) return "from-orange-500/10 to-transparent border-orange-500/60 shadow-[0_0_25px_rgba(249,115,22,0.4),0_0_50px_rgba(249,115,22,0.2)]";
+        return "from-transparent to-transparent border-gray-800/50 hover:border-gray-700";
     };
 
     return (
@@ -85,22 +69,26 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: rank * 0.03 }}
             className={clsx(
-                "relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.01] group",
+                "relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] group",
                 getRankStyle()
             )}
         >
-            {/* Rank Badge */}
+            {/* Rank Number */}
             <div className={clsx(
-                "w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg mr-4 flex-shrink-0",
-                getRankBadgeStyle()
+                "w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0",
+                rank <= 3 
+                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/30" 
+                    : "bg-white/5 text-gray-500 border border-white/5"
             )}>
                 {rank}
             </div>
 
             {/* Avatar */}
             <div className={clsx(
-                "w-12 h-12 rounded-full overflow-hidden mr-4 flex-shrink-0 transition-all",
-                getAvatarRingStyle()
+                "w-11 h-11 rounded-full overflow-hidden mr-4 flex-shrink-0 transition-all",
+                rank <= 3 
+                    ? "ring-2 ring-orange-500/50 ring-offset-1 ring-offset-black" 
+                    : "border border-gray-700"
             )}>
                 {user.avatar ? (
                     <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
@@ -112,48 +100,37 @@ const LeaderboardRow = ({ user, rank }: { user: User; rank: number }) => {
             {/* User Info */}
             <div className="flex-grow min-w-0">
                 <div className="flex items-center gap-2">
-                    <span className={clsx(
-                        "font-bold truncate",
-                        rank <= 3 ? "text-white text-lg" : "text-white"
-                    )}>
+                    <span className="font-semibold text-white truncate">
                         {displayHandle}
                     </span>
                     {(user.metrics.viral_clips || 0) > 0 && (
-                        <Flame className="w-4 h-4 text-orange-400 animate-pulse" />
+                        <Flame className="w-4 h-4 text-orange-400" />
                     )}
-                    {rank === 1 && <Trophy className="w-4 h-4 text-yellow-400" />}
                 </div>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-1.5 mt-1">
                     {user.linkedAccounts?.slice(0, 3).map((acc, i) => (
-                        <div key={i} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10">
-                            {getPlatformIcon(acc.platform, "w-3 h-3 text-gray-400")}
-                            <span className="text-[10px] text-gray-500">{acc.platform}</span>
+                        <div key={i} className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5">
+                            {getPlatformIcon(acc.platform, "w-3 h-3 text-gray-500")}
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-8">
-                <div className="text-right">
-                    <p className={clsx(
-                        "font-bold font-mono",
-                        rank <= 3 ? "text-2xl text-white" : "text-xl text-white"
-                    )}>
+            <div className="flex items-center gap-6 text-right">
+                <div>
+                    <p className="font-bold text-white text-lg tabular-nums">
                         {formatNumber(user.metrics.views)}
                     </p>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider flex items-center justify-end gap-1">
                         <Eye className="w-3 h-3" /> Views
                     </p>
                 </div>
-                <div className="text-right min-w-[80px]">
-                    <p className={clsx(
-                        "font-bold font-mono",
-                        rank <= 3 ? "text-xl text-orange-400" : "text-lg text-orange-400"
-                    )}>
-                        ${formatNumber(user.metrics.earnings || 0)}
+                <div>
+                    <p className="font-bold text-white text-lg tabular-nums">
+                        {formatNumber(user.metrics.likes)}
                     </p>
-                    <p className="text-[10px] text-orange-500/60 uppercase tracking-wider">Earned</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">Likes</p>
                 </div>
             </div>
         </motion.div>
