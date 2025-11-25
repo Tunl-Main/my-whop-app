@@ -198,7 +198,7 @@ export default function Leaderboard() {
             <div className="bg-gradient-to-b from-gray-900/50 to-black/50 backdrop-blur-sm rounded-3xl border border-white/10 overflow-hidden">
                 {/* Header */}
                 <div className="p-6 pb-4 border-b border-white/5">
-                    <h2 className="text-2xl font-bold text-white text-center mb-6">Clipper Leaderboard</h2>
+                    <p className="text-xs text-gray-500 text-center mb-4">Leaderboard data is updated daily</p>
                     
                     {/* Tabs Row */}
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
