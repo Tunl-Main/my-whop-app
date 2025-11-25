@@ -145,19 +145,27 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
             </div>
 
             {/* Stats - Prominent */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6 md:gap-8">
                 <div className="text-right">
-                    <p className="font-black text-white text-2xl md:text-3xl tabular-nums tracking-tight">
+                    <p className="font-black text-white text-xl md:text-2xl tabular-nums tracking-tight">
                         {formatNumber(user.metrics.views)}
                     </p>
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Views</p>
                 </div>
                 <div className="text-right">
-                    <p className="font-black text-white text-2xl md:text-3xl tabular-nums tracking-tight">
+                    <p className="font-black text-white text-xl md:text-2xl tabular-nums tracking-tight">
                         {formatNumber(user.metrics.likes)}
                     </p>
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Likes</p>
                 </div>
+                {(user.metrics.earnings !== undefined && user.metrics.earnings > 0) && (
+                    <div className="text-right">
+                        <p className="font-black text-green-400 text-xl md:text-2xl tabular-nums tracking-tight">
+                            ${formatNumber(user.metrics.earnings)}
+                        </p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Earned</p>
+                    </div>
+                )}
             </div>
         </motion.div>
     );

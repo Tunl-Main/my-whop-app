@@ -77,7 +77,7 @@ export default function BioVerification({
                     >
                         <FrostedGlass className="p-6 border border-white/10 rounded-2xl">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-bold text-white">Verify {platformName}</h2>
+                                <h2 className="text-xl font-bold text-white">Connect {platformName}</h2>
                                 <button
                                     onClick={onClose}
                                     className="text-gray-400 hover:text-white transition-colors"
@@ -160,10 +160,10 @@ export default function BioVerification({
                                         {isVerifying ? (
                                             <>
                                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                                Verifying...
+                                                Connecting...
                                             </>
                                         ) : (
-                                            "Verify Account"
+                                            "Connect Account"
                                         )}
                                     </button>
                                 </div>
