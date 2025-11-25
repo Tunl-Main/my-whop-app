@@ -1,6 +1,5 @@
 import Registration from "@/components/Registration";
 import Leaderboard from "@/components/Leaderboard";
-import CrownLogo from "@/components/CrownLogo";
 
 // Force dynamic rendering - no caching at build time or CDN edge
 export const dynamic = 'force-dynamic';
@@ -22,16 +21,24 @@ export default function Page() {
 			<div className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
 				<div className="max-w-7xl mx-auto">
 					{/* Header Section */}
-					<div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
+					<div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-8">
 						{/* Logo Area (Top Left) */}
-						<div className="flex items-center gap-4 pt-2">
-							<CrownLogo size={70} showGlow />
+						<div className="flex items-center gap-6">
+							{/* Logo Image */}
+							<div className="relative flex-shrink-0">
+								<div className="absolute -inset-2 bg-orange-500/20 rounded-2xl blur-xl" />
+								<img 
+									src="/crown-logo.png" 
+									alt="Clipper Leaderboard" 
+									className="relative w-24 h-24 md:w-28 md:h-28 object-contain drop-shadow-[0_0_20px_rgba(249,115,22,0.4)]"
+								/>
+							</div>
 							<div>
-								<h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-none">
+								<h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
 									Clipper
 									<span className="block text-orange-500">Leaderboard</span>
 								</h1>
-								<p className="text-sm text-gray-400 mt-2 max-w-xs font-medium">
+								<p className="text-sm text-gray-400 mt-3 max-w-sm font-medium">
 									Compete, track performance, and earn rewards.
 								</p>
 							</div>
