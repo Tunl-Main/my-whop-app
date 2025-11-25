@@ -58,7 +58,6 @@ const formatNumber = (num: number) => {
 const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number; onUserClick: (user: User) => void }) => {
     // Use Whop username, fallback to whopId if no username
     const displayName = user.username || user.whopId || "Unknown";
-    const whopProfileUrl = `https://whop.com/@${user.username || user.whopId}`;
 
     // Orange theme glow for top 3, subtle for rest
     const getRankStyle = () => {
@@ -66,14 +65,9 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
         return "from-transparent to-transparent border-gray-800/50 hover:border-gray-700";
     };
 
-    const handleFollow = (e: React.MouseEvent) => {
+    const handleActionClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        window.open(whopProfileUrl, '_blank', 'noopener,noreferrer');
-    };
-
-    const handleDM = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        window.open(whopProfileUrl, '_blank', 'noopener,noreferrer');
+        onUserClick(user);
     };
 
     return (
@@ -124,27 +118,29 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
                 <div className="flex items-center gap-1.5 mt-1">
                     {user.linkedAccounts?.slice(0, 3).map((acc, i) => (
                         <div key={i} className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5">
-                            {getPlatformIcon(acc.platform, "w-3 h-3 text-gray-500")}
+                            {getPlatformIcon(acc.platform, "w-4 h-4")}
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Inline Action Buttons - Show on hover */}
-            <div className="flex items-center gap-2 mr-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Inline Action Buttons - Always visible, prominent */}
+            <div className="flex items-center gap-2 mr-4">
                 <button
-                    onClick={handleFollow}
-                    className="p-2 rounded-lg bg-orange-500/20 hover:bg-orange-500/40 text-orange-400 transition-colors"
-                    title="Follow on Whop"
+                    onClick={handleActionClick}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors shadow-lg shadow-orange-500/20"
+                    title="Follow"
                 >
                     <UserPlus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Follow</span>
                 </button>
                 <button
-                    onClick={handleDM}
-                    className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 transition-colors"
-                    title="Message on Whop"
+                    onClick={handleActionClick}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors border border-white/10"
+                    title="Message"
                 >
                     <MessageCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">Chat</span>
                 </button>
             </div>
 
