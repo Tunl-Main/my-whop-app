@@ -17,11 +17,14 @@ interface Clip {
 
 import { useState, useEffect } from "react";
 
-export default function TopClips() {
+interface TopClipsProps {
+    timeRange?: 'week' | 'month' | 'all';
+}
+
+export default function TopClips({ timeRange = 'week' }: TopClipsProps) {
     const [clips, setClips] = useState<Clip[]>([]);
     const [loading, setLoading] = useState(true);
     const [playingClipId, setPlayingClipId] = useState<string | null>(null);
-    const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week');
 
     const getEmbedUrl = (url: string) => {
         try {
@@ -78,24 +81,6 @@ export default function TopClips() {
 
     return (
         <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Top Clips</h2>
-                <div className="flex bg-white/5 rounded-lg p-1 gap-1">
-                    {(['week', 'month', 'all'] as const).map((range) => (
-                        <button
-                            key={range}
-                            onClick={() => setTimeRange(range)}
-                            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${timeRange === range
-                                ? 'bg-orange-500 text-white shadow-lg'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                }`}
-                        >
-                            {range === 'week' ? 'This Week' : range === 'month' ? 'This Month' : 'All Time'}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
             {/* Top 3 Grid - Compact */}
             <div className="grid grid-cols-3 gap-4 mb-8">
                 {clips.slice(0, 3).map((clip, index) => {

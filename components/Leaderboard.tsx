@@ -249,84 +249,84 @@ export default function Leaderboard() {
                     {/* Tabs Row */}
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         {/* View Toggle */}
-                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                            <button
-                                onClick={() => setView('creators')}
-                                className={clsx(
+                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                    <button
+                        onClick={() => setView('creators')}
+                        className={clsx(
                                     "px-5 py-2 rounded-lg text-sm font-medium transition-all",
-                                    view === 'creators' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
-                                )}
-                            >
-                                Clippers
-                            </button>
-                            <button
-                                onClick={() => setView('clips')}
-                                className={clsx(
+                            view === 'creators' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
+                        )}
+                    >
+                        Clippers
+                    </button>
+                    <button
+                        onClick={() => setView('clips')}
+                        className={clsx(
                                     "px-5 py-2 rounded-lg text-sm font-medium transition-all",
-                                    view === 'clips' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
-                                )}
-                            >
-                                Top Clips
-                            </button>
-                        </div>
+                            view === 'clips' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-gray-400 hover:text-white"
+                        )}
+                    >
+                        Top Clips
+                    </button>
+                </div>
 
                         {/* Time Filter */}
                         <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
                             {(['week', 'month', 'all'] as const).map((f) => (
-                                <button
-                                    key={f}
+                        <button
+                            key={f}
                                     onClick={() => setFilter(f)}
-                                    className={clsx(
+                            className={clsx(
                                         "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                        filter === f
+                                filter === f
                                             ? "bg-white/10 text-white"
                                             : "text-gray-500 hover:text-gray-300"
-                                    )}
-                                >
+                            )}
+                        >
                                     {f === 'week' ? 'This Week' : f === 'month' ? 'This Month' : 'All Time'}
-                                </button>
-                            ))}
+                        </button>
+                    ))}
                         </div>
-                    </div>
                 </div>
+            </div>
 
                 {/* Content */}
                 <div className="p-6">
                     {view === 'creators' ? (
                         <>
-                            {/* Podium - Top 3 */}
-                            {top3.length >= 3 && (
+                            {/* Podium - Top 3 (or less) */}
+                            {top3.length > 0 && (
                                 <div className="flex justify-center items-end gap-4 mb-8 pt-6">
-                                    <PodiumCard user={top3[1]} rank={2} />
-                                    <PodiumCard user={top3[0]} rank={1} isCenter />
-                                    <PodiumCard user={top3[2]} rank={3} />
-                                </div>
+                                    {top3.length >= 2 && <PodiumCard user={top3[1]} rank={2} />}
+                                    {top3.length >= 1 && <PodiumCard user={top3[0]} rank={1} isCenter />}
+                                    {top3.length >= 3 && <PodiumCard user={top3[2]} rank={3} />}
+                                    </div>
                             )}
 
                             {/* Rest of Leaderboard */}
                             <div className="space-y-2">
                                 {rest.map((user, index) => (
                                     <LeaderboardRow key={user.id} user={user} rank={index + 4} />
-                                ))}
-                            </div>
+                                                ))}
+                                            </div>
 
                             {users.length === 0 && !loading && (
                                 <div className="text-center py-12 text-gray-500">
                                     No clippers found for this time period.
-                                </div>
-                            )}
+                                                    </div>
+                                                )}
 
                             {loading && (
                                 <div className="text-center py-12 text-gray-500">
                                     Loading...
-                                </div>
+                                            </div>
                             )}
                         </>
                     ) : (
-                        <TopClips />
+                        <TopClips timeRange={filter} />
                     )}
                 </div>
-            </div>
+                </div>
 
             {/* Sidebar Section - Rising Stars */}
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
