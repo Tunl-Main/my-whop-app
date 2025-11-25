@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, ChevronDown, Star } from "lucide-react";
-import { FrostedGlass } from "./FrostedGlass";
+import { Trophy, ChevronDown, Eye, Heart, TrendingUp, Flame, DollarSign } from "lucide-react";
 import clsx from "clsx";
 
 interface Achievement {
@@ -36,183 +35,138 @@ interface MiniProfileProps {
     username: string;
 }
 
-const BADGES = [
-    { name: "10k Views", threshold: 10000, icon: "🔥" },
-    { name: "100k Views", threshold: 100000, icon: "🚀" },
-    { name: "1M Views", threshold: 1000000, icon: "👑" },
-    { name: "First $100", threshold: 100, type: "earnings", icon: "💰" },
-];
-
 // Helper for compact number formatting
 const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US', {
         notation: "compact",
         maximumFractionDigits: 1
-    }).format(num).toLowerCase();
+    }).format(num);
 };
 
 export default function MiniProfile({ user, username }: MiniProfileProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // Calculate next achievement
-    const nextBadge = BADGES.find(b => {
-        const current = b.type === "earnings" ? (user.metrics.earnings || 0) : user.metrics.views;
-        return current < b.threshold;
-    });
-
-    const progress = nextBadge
-        ? Math.min(100, ((nextBadge.type === "earnings" ? (user.metrics.earnings || 0) : user.metrics.views) / nextBadge.threshold) * 100)
-        : 100;
-
     const linkedAccount = user.linkedAccounts && user.linkedAccounts.length > 0 ? user.linkedAccounts[0] : null;
-    const isSyncing = user.metrics.total_posts === 0 && linkedAccount; // Simple heuristic for syncing
-
-    console.log("MiniProfile User Data (v1.1):", user);
 
     return (
-        <div
-            className="relative z-50 w-full max-w-md mx-auto mb-12 group"
-            onMouseEnter={() => setIsExpanded(true)}
-            onMouseLeave={() => setIsExpanded(false)}
-        >
-            {/* Ambient Glow */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500/20 to-purple-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
-
-            <FrostedGlass variant="premium" className="relative rounded-3xl overflow-hidden transition-all duration-500">
-                {/* Header / Collapsed View */}
-                <div className="p-5 flex items-center gap-5 cursor-pointer relative z-10">
-                    <div className="relative">
-                        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 shadow-inner">
-                            <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover" />
-                        </div>
-                        {/* Status Dot */}
-                        <div className={clsx(
-                            "absolute bottom-0 right-0 w-4 h-4 border-2 border-black rounded-full animate-pulse",
-                            isSyncing ? "bg-yellow-500" : "bg-green-500"
-                        )} />
-                    </div>
-
-                    <div className="flex-grow">
-                        <h3 className="text-white font-bold text-xl tracking-tight">{username}</h3>
-                        {linkedAccount && (
-                            <p className="text-xs text-gray-400 font-medium flex items-center gap-1">
-                                <span className="capitalize text-orange-400">{linkedAccount.platform}</span>
-                                <span>{linkedAccount.handle.startsWith('@') ? linkedAccount.handle : `@${linkedAccount.handle}`}</span>
-                                {isSyncing && <span className="text-yellow-500 ml-2 animate-pulse">(Syncing...)</span>}
-                            </p>
-                        )}
-                        <div className="flex items-center gap-3 text-sm text-gray-400 mt-2">
-                            <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
-                                <Trophy className="w-3.5 h-3.5 text-orange-400" />
-                                <span className="font-medium text-gray-300">{user.achievements.length}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
-                                <span className="text-orange-400 font-bold">$</span>
-                                <span className="font-mono text-gray-300">{user.metrics.earnings?.toLocaleString() || 0}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-1">
-                        <div className="flex -space-x-2">
-                            {user.achievements.slice(0, 3).map((ach, i) => (
-                                <div key={i} className="w-7 h-7 rounded-full bg-black/80 flex items-center justify-center text-xs border border-white/10 shadow-lg relative z-10" title={ach.name}>
-                                    {ach.icon}
+        <div className="w-full max-w-sm">
+            {/* Main Card */}
+            <div 
+                className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden cursor-pointer group"
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
+                {/* Subtle glow effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Header Section */}
+                <div className="relative p-5">
+                    <div className="flex items-start gap-4">
+                        {/* Avatar with orange ring */}
+                        <div className="relative flex-shrink-0">
+                            {/* Outer glow */}
+                            <div className="absolute -inset-1 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full blur-sm opacity-60" />
+                            {/* Orange ring */}
+                            <div className="relative w-16 h-16 rounded-full p-[3px] bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
+                                <div className="w-full h-full rounded-full overflow-hidden bg-black">
+                                    <img 
+                                        src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
+                                        alt="Avatar" 
+                                        className="w-full h-full object-cover"
+                                    />
                                 </div>
-                            ))}
+                            </div>
                         </div>
-                        <ChevronDown className={clsx("w-5 h-5 text-gray-500 transition-transform duration-300", isExpanded ? "rotate-180" : "")} />
+
+                        {/* User Info */}
+                        <div className="flex-grow min-w-0">
+                            <h3 className="text-white font-bold text-lg truncate">{username}</h3>
+                            {linkedAccount && (
+                                <p className="text-sm text-gray-400 truncate">
+                                    <span className="capitalize text-orange-400">{linkedAccount.platform}</span>
+                                    {' '}
+                                    <span className="text-gray-500">{linkedAccount.handle.startsWith('@') ? linkedAccount.handle : `@${linkedAccount.handle}`}</span>
+                                </p>
+                            )}
+                            
+                            {/* Quick Stats Row */}
+                            <div className="flex items-center gap-4 mt-3">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center">
+                                        <Trophy className="w-3 h-3 text-orange-400" />
+                                    </div>
+                                    <span className="text-white font-semibold text-sm">{user.metrics.viral_clips || 0}</span>
+                                    <span className="text-gray-500 text-xs">viral clips</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                                        <DollarSign className="w-3 h-3 text-green-400" />
+                                    </div>
+                                    <span className="text-white font-semibold text-sm">${user.metrics.earnings || 0}</span>
+                                    <span className="text-gray-500 text-xs">earned</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Expand Arrow */}
+                        <ChevronDown className={clsx(
+                            "w-5 h-5 text-gray-500 transition-transform duration-300 flex-shrink-0",
+                            isExpanded && "rotate-180"
+                        )} />
                     </div>
                 </div>
 
-                {/* Expanded View */}
+                {/* Expanded Stats Section */}
                 <AnimatePresence>
                     {isExpanded && (
                         <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden bg-black/20"
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
                         >
-                            <div className="px-5 pb-6 pt-2 space-y-5">
+                            <div className="px-5 pb-5">
                                 {/* Divider */}
-                                <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-
-
-                                {/* Detailed Metrics Grid */}
-                                <div className="grid grid-cols-2 gap-2 mb-2">
-                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
-                                        <p className="text-[10px] text-gray-500 uppercase">Total Views</p>
-                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.views || 0)}</p>
+                                <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
+                                
+                                {/* Total Stats Label */}
+                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Total stats</p>
+                                
+                                {/* Stats Grid */}
+                                <div className="grid grid-cols-5 gap-2">
+                                    <div className="text-center">
+                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.views || 0)}</p>
+                                        <p className="text-[10px] text-gray-500 uppercase">Views</p>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
-                                        <p className="text-[10px] text-gray-500 uppercase">Total Likes</p>
-                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.likes || 0)}</p>
+                                    <div className="text-center">
+                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.likes || 0)}</p>
+                                        <p className="text-[10px] text-gray-500 uppercase">Likes</p>
                                     </div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                    <div className="text-center">
+                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.avg_views || 0)}</p>
                                         <p className="text-[10px] text-gray-500 uppercase">Avg Views</p>
-                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.avg_views || 0)}</p>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                    <div className="text-center">
+                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.avg_likes || 0)}</p>
                                         <p className="text-[10px] text-gray-500 uppercase">Avg Likes</p>
-                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.avg_likes || 0)}</p>
                                     </div>
-                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5">
+                                    <div className="text-center">
+                                        <p className="text-white font-bold text-lg">{formatNumber(user.metrics.total_posts || 0)}</p>
                                         <p className="text-[10px] text-gray-500 uppercase">Posts</p>
-                                        <p className="text-white font-mono text-sm">{formatNumber(user.metrics.total_posts || 0)}</p>
-                                    </div>
-                                    <div className="bg-white/5 p-2 rounded-lg text-center border border-white/5 col-span-3 mt-1">
-                                        <p className="text-[10px] text-gray-500 uppercase text-orange-400">Viral Clips (&gt;100k)</p>
-                                        <p className="text-white font-mono text-sm font-bold">{formatNumber(user.metrics.viral_clips || 0)}</p>
                                     </div>
                                 </div>
 
-                                {/* Next Achievement Progress */}
-                                {nextBadge ? (
-                                    <div>
-                                        <div className="flex justify-between items-end mb-2">
-                                            <div>
-                                                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Next Goal</p>
-                                                <p className="text-sm text-white font-medium">{nextBadge.name}</p>
-                                            </div>
-                                            <span className="text-xs font-mono text-orange-400">{Math.round(progress)}%</span>
-                                        </div>
-
-                                        <div className="relative w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${progress}%` }}
-                                                className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]"
-                                            />
-                                        </div>
-
-                                        <p className="text-[10px] text-gray-500 mt-1.5 text-right font-mono">
-                                            {nextBadge.type === "earnings" ? "$" : ""}{(nextBadge.type === "earnings" ? (user.metrics.earnings || 0) : user.metrics.views).toLocaleString()} <span className="text-gray-700">/</span> {nextBadge.threshold.toLocaleString()}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-2">
-                                        <p className="text-sm text-orange-400 font-medium">All achievements unlocked! 🏆</p>
-                                    </div>
-                                )}
-
-                                {/* Recent Achievements Grid */}
+                                {/* Achievements */}
                                 {user.achievements.length > 0 && (
-                                    <div>
-                                        <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-3">Collection</p>
-                                        <div className="grid grid-cols-4 gap-3">
-                                            {user.achievements.map((ach) => (
-                                                <div key={ach.id} className="group/badge flex flex-col items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-orange-500/30 transition-all cursor-help">
-                                                    <span className="text-xl filter drop-shadow-lg group-hover/badge:scale-110 transition-transform">{ach.icon}</span>
-                                                </div>
-                                            ))}
-                                            {/* Empty slots filler */}
-                                            {[...Array(Math.max(0, 4 - user.achievements.length))].map((_, i) => (
-                                                <div key={`empty-${i}`} className="flex flex-col items-center justify-center p-2 rounded-xl border border-white/5 border-dashed opacity-30">
-                                                    <div className="w-4 h-4 rounded-full bg-white/10" />
+                                    <div className="mt-4 pt-4 border-t border-white/5">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            {user.achievements.slice(0, 5).map((ach) => (
+                                                <div 
+                                                    key={ach.id} 
+                                                    className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm border border-white/10 hover:scale-110 transition-transform cursor-help"
+                                                    title={ach.name}
+                                                >
+                                                    {ach.icon}
                                                 </div>
                                             ))}
                                         </div>
@@ -222,8 +176,7 @@ export default function MiniProfile({ user, username }: MiniProfileProps) {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </FrostedGlass>
-            <div className="text-center mt-2 text-[10px] text-gray-600">v1.1</div>
-        </div >
+            </div>
+        </div>
     );
 }
