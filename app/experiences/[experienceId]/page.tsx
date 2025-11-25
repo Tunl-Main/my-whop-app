@@ -52,13 +52,10 @@ export default async function ExperiencePage({
 								/>
 							</div>
 							<div>
-								<h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
+								<h1 className="text-7xl md:text-[10rem] font-black italic tracking-tighter text-white uppercase transform -skew-x-6 leading-[0.85]">
 									Clipper
 									<span className="block text-orange-500">Leaderboard</span>
 								</h1>
-								<p className="text-sm text-gray-400 mt-3 max-w-sm font-medium">
-									Compete, track performance, and earn rewards.
-								</p>
 							</div>
 						</div>
 
