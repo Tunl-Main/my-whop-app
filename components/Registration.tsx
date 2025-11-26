@@ -27,11 +27,13 @@ const PLATFORMS = [
 export default function Registration({
     userId: propUserId,
     username: propUsername,
-    avatar: propAvatar
+    avatar: propAvatar,
+    onConnectionChange
 }: {
     userId?: string;
     username?: string;
     avatar?: string;
+    onConnectionChange?: (connected: boolean) => void;
 } = {}) {
     const [selectedPlatform, setSelectedPlatform] = useState<typeof PLATFORMS[number]['id']>('instagram');
     const [otp, setOtp] = useState<string | null>(null);
@@ -49,11 +51,16 @@ export default function Registration({
                     return null;
                 })
                 .then(data => {
-                    if (data) setUser(data);
+                    if (data) {
+                        setUser(data);
+                        // Notify parent of connection status
+                        const hasLinkedAccounts = data.linkedAccounts && data.linkedAccounts.length > 0;
+                        onConnectionChange?.(hasLinkedAccounts);
+                    }
                 })
                 .catch(err => console.error("Error fetching user:", err));
         }
-    }, [propUserId]);
+    }, [propUserId, onConnectionChange]);
 
     const handleConnectNewAccount = (platform: string) => {
         // Set the selected platform and open the bio verification modal
@@ -93,6 +100,9 @@ export default function Registration({
                             if (data.error) throw new Error(data.error);
                             // Refresh user data to show updated linked accounts
                             setUser(data.user);
+                            // Notify parent of connection status
+                            const hasLinkedAccounts = data.user?.linkedAccounts && data.user.linkedAccounts.length > 0;
+                            onConnectionChange?.(hasLinkedAccounts);
                         }}
                     />
                 )}

@@ -1,11 +1,47 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
 import Registration from "@/components/Registration";
 import Leaderboard from "@/components/Leaderboard";
 
-// Force dynamic rendering - no caching at build time or CDN edge
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+interface ExperiencePageClientProps {
+	userId: string;
+	username: string;
+	avatar: string;
+}
 
-export default function Page() {
+export default function ExperiencePageClient({ userId, username, avatar }: ExperiencePageClientProps) {
+	const [isUserConnected, setIsUserConnected] = useState(false);
+	const registrationRef = useRef<{ triggerConnect: () => void } | null>(null);
+
+	// Check if user has connected accounts
+	useEffect(() => {
+		if (userId) {
+			fetch(`/api/user?whopId=${userId}`)
+				.then(res => res.json())
+				.then(data => {
+					// User is "connected" if they have at least one linked account
+					const hasLinkedAccounts = data.linkedAccounts && data.linkedAccounts.length > 0;
+					setIsUserConnected(hasLinkedAccounts);
+				})
+				.catch(() => {
+					setIsUserConnected(false);
+				});
+		}
+	}, [userId]);
+
+	const handleConnectClick = () => {
+		// Scroll to registration section and trigger connect modal
+		const registrationElement = document.getElementById('registration-section');
+		if (registrationElement) {
+			registrationElement.scrollIntoView({ behavior: 'smooth' });
+		}
+		// Trigger the registration connect flow
+		if (registrationRef.current?.triggerConnect) {
+			registrationRef.current.triggerConnect();
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-black text-white selection:bg-orange-500/30">
 			{/* Background Effects */}
@@ -45,17 +81,25 @@ export default function Page() {
 						</div>
 
 						{/* Profile/Registration Area (Top Right) */}
-						<div className="w-full md:w-auto md:min-w-[380px]">
-							<Registration />
+						<div id="registration-section" className="w-full md:w-auto md:min-w-[380px]">
+							<Registration 
+								userId={userId} 
+								username={username} 
+								avatar={avatar}
+								onConnectionChange={(connected) => setIsUserConnected(connected)}
+							/>
 						</div>
 					</div>
 
 					<div className="mt-4">
-						{/* Non-authenticated page - show blur by default */}
-						<Leaderboard isUserConnected={false} />
+						<Leaderboard 
+							isUserConnected={isUserConnected} 
+							onConnectClick={handleConnectClick}
+						/>
 					</div>
 				</div>
 			</div>
 		</div>
 	);
 }
+

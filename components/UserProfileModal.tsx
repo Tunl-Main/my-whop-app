@@ -1,33 +1,67 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, UserPlus, MessageCircle, ExternalLink, Eye, Heart, Flame, Instagram, Youtube, Twitter } from "lucide-react";
-import clsx from "clsx";
+import { X, UserPlus, MessageCircle, ExternalLink, Eye, Heart, Flame } from "lucide-react";
 
-// Custom TikTok Icon
-const TikTokIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em" className={className}>
-        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
-    </svg>
-);
+// App Store style platform icon for modal
+const PlatformAppIcon = ({ platform, size = 24 }: { platform: string; size?: number }) => {
+    const normalizedPlatform = platform === 'twitter' ? 'x' : platform;
+    const baseStyle = {
+        width: size,
+        height: size,
+        borderRadius: size * 0.22,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden' as const,
+    };
 
-const getPlatformIcon = (platform: string, className: string = "w-4 h-4") => {
-    switch (platform) {
-        case 'instagram': return <Instagram className={className} />;
-        case 'tiktok': return <TikTokIcon className={className} />;
-        case 'youtube': return <Youtube className={className} />;
-        case 'twitter': return <Twitter className={className} />;
-        default: return null;
-    }
+    return (
+        <div style={baseStyle}>
+            {normalizedPlatform === 'instagram' && (
+                <div style={{ 
+                    ...baseStyle, 
+                    background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
+                }}>
+                    <svg viewBox="0 0 24 24" fill="white" width={size * 0.6} height={size * 0.6}>
+                        <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
+                    </svg>
+                </div>
+            )}
+            {normalizedPlatform === 'tiktok' && (
+                <div style={{ ...baseStyle, background: '#000' }}>
+                    <svg viewBox="0 0 24 24" width={size * 0.6} height={size * 0.6}>
+                        <path fill="#25F4EE" d="M9.37 23.5v-11.2l.02-5.15h3.6c-.03.62.1 1.28.42 1.86.32.58.81 1.05 1.4 1.35v3.34a7.07 7.07 0 01-3.78-.95v7.27a4.51 4.51 0 01-1.13 3c-.74.85-1.76 1.39-2.87 1.5a4.56 4.56 0 01-3.15-.87 4.51 4.51 0 01-1.68-2.73 4.46 4.46 0 01.53-3.12 4.52 4.52 0 012.43-2.02 4.6 4.6 0 013.13-.14v3.54a1.52 1.52 0 00-1.27.26c-.34.26-.58.63-.67 1.05-.1.42-.04.86.16 1.24.2.39.54.7.94.87.41.17.86.19 1.28.06.42-.13.78-.41 1.03-.79.24-.38.37-.83.36-1.28l.01-7.28z"/>
+                        <path fill="#FE2C55" d="M10.33 23.5v-11.2l.03-5.15h3.59a4.48 4.48 0 001.82 3.21v3.34a7.07 7.07 0 01-3.78-.95v7.27c0 .78-.2 1.55-.58 2.23a4.5 4.5 0 01-3.42 2.27 4.56 4.56 0 01-3.15-.87 4.47 4.47 0 002.73.47 4.52 4.52 0 002.87-1.5c.5-.57.85-1.26 1.02-2 .17-.75.17-1.53 0-2.28l-.13-.84z"/>
+                        <path fill="white" d="M15.77 10.36V7.02a4.44 4.44 0 01-1.4-1.35 4.38 4.38 0 01-.42-1.86h-3.6l-.02 12.35v.04a1.52 1.52 0 01-.36 1.28c-.25.38-.61.66-1.03.79a1.53 1.53 0 01-1.28-.06 1.51 1.51 0 01-.94-.87 1.5 1.5 0 01-.16-1.24c.09-.42.33-.79.67-1.05a1.52 1.52 0 011.27-.26v-3.54a4.6 4.6 0 00-3.13.14 4.52 4.52 0 00-2.43 2.02 4.46 4.46 0 00-.53 3.12 4.51 4.51 0 001.68 2.73c.9.71 2.01 1.06 3.15.87a4.5 4.5 0 003.42-2.27c.38-.68.58-1.45.58-2.23v-7.27a7.07 7.07 0 003.78.95v-3.34l-.25-.05z"/>
+                    </svg>
+                </div>
+            )}
+            {normalizedPlatform === 'youtube' && (
+                <div style={{ ...baseStyle, background: '#FF0000' }}>
+                    <svg viewBox="0 0 24 24" fill="white" width={size * 0.5} height={size * 0.5}>
+                        <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </div>
+            )}
+            {normalizedPlatform === 'x' && (
+                <div style={{ ...baseStyle, background: '#000' }}>
+                    <svg viewBox="0 0 24 24" fill="white" width={size * 0.45} height={size * 0.45}>
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </div>
+            )}
+        </div>
+    );
 };
 
 const getPlatformUrl = (platform: string, handle: string) => {
-    switch (platform) {
+    const normalizedPlatform = platform === 'twitter' ? 'x' : platform;
+    switch (normalizedPlatform) {
         case 'instagram': return `https://instagram.com/${handle}`;
         case 'tiktok': return `https://tiktok.com/@${handle}`;
         case 'youtube': return `https://youtube.com/@${handle}`;
-        case 'twitter': return `https://twitter.com/${handle}`;
+        case 'x': return `https://x.com/${handle}`;
         default: return '#';
     }
 };
@@ -188,7 +222,7 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all"
                                             >
-                                                {getPlatformIcon(acc.platform, "w-5 h-5")}
+                                                <PlatformAppIcon platform={acc.platform} size={20} />
                                                 <span className="text-sm text-gray-300">@{acc.handle.replace(/^@/, '')}</span>
                                             </a>
                                         ))}
