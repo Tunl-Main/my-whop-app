@@ -19,9 +19,10 @@ import { useState, useEffect } from "react";
 
 interface TopClipsProps {
     timeRange?: 'week' | 'month' | 'all';
+    platform?: 'all' | 'instagram' | 'tiktok' | 'youtube' | 'x';
 }
 
-export default function TopClips({ timeRange = 'week' }: TopClipsProps) {
+export default function TopClips({ timeRange = 'week', platform = 'all' }: TopClipsProps) {
     const [clips, setClips] = useState<Clip[]>([]);
     const [loading, setLoading] = useState(true);
     const [playingClipId, setPlayingClipId] = useState<string | null>(null);
@@ -59,7 +60,8 @@ export default function TopClips({ timeRange = 'week' }: TopClipsProps) {
 
     useEffect(() => {
         setLoading(true);
-        fetch(`/api/clips?range=${timeRange}`)
+        const platformParam = platform !== 'all' ? `&platform=${platform === 'x' ? 'twitter' : platform}` : '';
+        fetch(`/api/clips?range=${timeRange}${platformParam}`)
             .then(res => res.json())
             .then(data => {
                 setClips(data);
@@ -69,7 +71,7 @@ export default function TopClips({ timeRange = 'week' }: TopClipsProps) {
                 console.error("Error fetching clips:", err);
                 setLoading(false);
             });
-    }, [timeRange]);
+    }, [timeRange, platform]);
 
     if (loading) {
         return <div className="text-center text-gray-500 py-12">Loading top clips...</div>;

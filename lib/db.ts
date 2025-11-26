@@ -220,7 +220,11 @@ export interface Clip {
   };
 }
 
-export async function getTopClips(limit: number = 10, range: 'week' | 'month' | 'all' = 'all'): Promise<Clip[]> {
+export async function getTopClips(
+  limit: number = 10, 
+  range: 'week' | 'month' | 'all' = 'all',
+  platform?: 'instagram' | 'tiktok' | 'youtube' | 'twitter'
+): Promise<Clip[]> {
   let query = supabase
     .from('clips')
     .select(`
@@ -244,6 +248,11 @@ export async function getTopClips(limit: number = 10, range: 'week' | 'month' | 
   } else if (range === 'month') {
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     query = query.gte('posted_at', monthAgo);
+  }
+
+  // Filter by platform if specified
+  if (platform) {
+    query = query.eq('platform', platform);
   }
 
   const { data, error } = await query;
@@ -276,7 +285,10 @@ export async function getTopClips(limit: number = 10, range: 'week' | 'month' | 
   });
 }
 
-export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week'): Promise<User[]> {
+export async function getLeaderboardData(
+  range: 'week' | 'month' | 'all' = 'week',
+  platform?: 'instagram' | 'tiktok' | 'youtube' | 'twitter'
+): Promise<User[]> {
   // 1. Calculate start date based on range
   let startDate: string | null = null;
   const now = new Date();
@@ -304,13 +316,18 @@ export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week
     return [];
   }
 
-  // 3. Fetch Clips (filtered by date if needed)
+  // 3. Fetch Clips (filtered by date and optionally by platform)
   let query = supabase
     .from('clips')
-    .select('user_id, views, likes, posted_at');
+    .select('user_id, views, likes, posted_at, platform');
 
   if (startDate) {
     query = query.gte('posted_at', startDate);
+  }
+
+  // Filter by platform if specified
+  if (platform) {
+    query = query.eq('platform', platform);
   }
 
   const { data: clips, error: clipsError } = await query;
