@@ -340,7 +340,7 @@ export default function Leaderboard() {
                     )}
                     
                     {view === 'rising' && (
-                        <RisingStars variant="full" />
+                        <RisingStars variant="full" timeRange={filter} />
                     )}
                 </div>
             </div>

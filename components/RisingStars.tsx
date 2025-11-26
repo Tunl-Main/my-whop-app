@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, Users, Eye, Heart } from "lucide-react";
+import { TrendingUp, Eye } from "lucide-react";
 import clsx from "clsx";
 
 interface RisingStar {
@@ -10,23 +10,32 @@ interface RisingStar {
     username: string;
     avatar: string;
     growthPercent: number;
-    newFollowers: number;
-    views?: number;
-    likes?: number;
+    views: number;
+    previousViews?: number;
 }
 
 interface RisingStarsProps {
     variant?: 'sidebar' | 'full';
+    timeRange?: 'week' | 'month' | 'all';
 }
 
-export default function RisingStars({ variant = 'sidebar' }: RisingStarsProps) {
+// Helper for compact number formatting
+const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+        notation: "compact",
+        maximumFractionDigits: 1
+    }).format(num);
+};
+
+export default function RisingStars({ variant = 'sidebar', timeRange = 'week' }: RisingStarsProps) {
     const [stars, setStars] = useState<RisingStar[]>([]);
     const [loading, setLoading] = useState(true);
 
     const isFull = variant === 'full';
 
     useEffect(() => {
-        fetch('/api/rising-stars')
+        setLoading(true);
+        fetch(`/api/rising-stars?range=${timeRange}`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -38,7 +47,7 @@ export default function RisingStars({ variant = 'sidebar' }: RisingStarsProps) {
                 console.error("Failed to fetch rising stars:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [timeRange]);
 
     if (loading) {
         return (
@@ -85,68 +94,63 @@ export default function RisingStars({ variant = 'sidebar' }: RisingStarsProps) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.03 }}
                         className={clsx(
-                            "relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] group",
+                            "relative flex flex-col sm:flex-row sm:items-center p-3 sm:p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] group gap-2 sm:gap-0",
                             index < 3
                                 ? "from-green-500/10 to-transparent border-green-500/40 shadow-[0_0_25px_rgba(34,197,94,0.3)]"
                                 : "from-transparent to-transparent border-gray-800/50 hover:border-gray-700"
                         )}
                     >
-                        {/* Rank Number */}
-                        <div className={clsx(
-                            "w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0",
-                            index < 3
-                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                                : "bg-white/5 text-gray-500 border border-white/5"
-                        )}>
-                            {index + 1}
-                        </div>
-
-                        {/* Avatar */}
-                        <div className={clsx(
-                            "w-12 h-12 rounded-full overflow-hidden mr-4 flex-shrink-0 transition-all",
-                            index < 3
-                                ? "ring-2 ring-green-500/50 ring-offset-1 ring-offset-black"
-                                : "border border-gray-700"
-                        )}>
-                            <img
-                                src={star.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${star.username}`}
-                                alt={star.username}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-
-                        {/* User Info */}
-                        <div className="flex-grow min-w-0">
-                            <div className="flex items-center gap-2">
-                                <span className="font-bold text-white text-lg truncate">
-                                    @{star.username}
-                                </span>
-                                <TrendingUp className="w-4 h-4 text-green-400" />
+                        {/* Row 1: Rank, Avatar, Name */}
+                        <div className="flex items-center">
+                            {/* Rank Number */}
+                            <div className={clsx(
+                                "w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg flex items-center justify-center font-bold text-[10px] sm:text-sm mr-1.5 sm:mr-4 flex-shrink-0",
+                                index < 3
+                                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                    : "bg-white/5 text-gray-500 border border-white/5"
+                            )}>
+                                {index + 1}
                             </div>
-                            <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                                <div className="flex items-center gap-1">
-                                    <Users className="w-3 h-3" />
-                                    +{star.newFollowers.toLocaleString()} new followers
+
+                            {/* Avatar */}
+                            <div className={clsx(
+                                "w-8 h-8 sm:w-12 sm:h-12 rounded-full overflow-hidden mr-1.5 sm:mr-4 flex-shrink-0 transition-all",
+                                index < 3
+                                    ? "ring-2 ring-green-500/50 ring-offset-1 ring-offset-black"
+                                    : "border border-gray-700"
+                            )}>
+                                <img
+                                    src={star.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${star.username}`}
+                                    alt={star.username}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+
+                            {/* User Info */}
+                            <div className="flex-grow min-w-0 sm:mr-4">
+                                <div className="flex items-center gap-1 sm:gap-2">
+                                    <span className="font-bold text-white text-xs sm:text-lg truncate">
+                                        {star.username}
+                                    </span>
+                                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Growth Stats */}
-                        <div className="flex items-center gap-8">
-                            <div className="text-right">
-                                <p className="font-black text-green-400 text-2xl md:text-3xl tabular-nums tracking-tight">
+                        {/* Row 2 / Desktop inline: Growth Stats */}
+                        <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-8 sm:ml-auto">
+                            <div className="text-center sm:text-right">
+                                <p className="font-black text-green-400 text-lg sm:text-2xl md:text-3xl tabular-nums tracking-tight">
                                     +{star.growthPercent}%
                                 </p>
-                                <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Growth</p>
+                                <p className="text-[8px] sm:text-xs text-gray-500 uppercase tracking-wider font-medium">Views Growth</p>
                             </div>
-                            {star.views && (
-                                <div className="text-right">
-                                    <p className="font-bold text-white text-xl tabular-nums">
-                                        {new Intl.NumberFormat('en-US', { notation: 'compact' }).format(star.views)}
-                                    </p>
-                                    <p className="text-xs text-gray-500 uppercase tracking-wider">Views</p>
-                                </div>
-                            )}
+                            <div className="text-center sm:text-right">
+                                <p className="font-bold text-white text-sm sm:text-xl tabular-nums">
+                                    {formatNumber(star.views)}
+                                </p>
+                                <p className="text-[8px] sm:text-xs text-gray-500 uppercase tracking-wider">Views</p>
+                            </div>
                         </div>
                     </motion.div>
                 ))}
@@ -176,10 +180,10 @@ export default function RisingStars({ variant = 'sidebar' }: RisingStarsProps) {
                         <div className="flex items-center gap-3">
                             <img src={star.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${star.username}`} className="w-10 h-10 rounded-full border border-white/10" />
                             <div>
-                                <p className="font-medium text-white text-sm">@{star.username}</p>
+                                <p className="font-medium text-white text-sm">{star.username}</p>
                                 <div className="flex items-center gap-1 text-xs text-gray-400">
-                                    <Users className="w-3 h-3" />
-                                    +{star.newFollowers.toLocaleString()} new
+                                    <Eye className="w-3 h-3" />
+                                    {formatNumber(star.views)} views
                                 </div>
                             </div>
                         </div>
@@ -187,7 +191,7 @@ export default function RisingStars({ variant = 'sidebar' }: RisingStarsProps) {
                         <div className="text-right">
                             <div className="text-green-400 font-bold text-sm flex items-center justify-end gap-1">
                                 <TrendingUp className="w-3 h-3" />
-                                {star.growthPercent}%
+                                +{star.growthPercent}%
                             </div>
                             <p className="text-[10px] text-gray-500 uppercase tracking-wider">Growth</p>
                         </div>

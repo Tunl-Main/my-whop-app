@@ -289,13 +289,14 @@ export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week
     startDate = monthAgo.toISOString();
   }
 
-  // 2. Fetch Users
+  // 2. Fetch Users with metrics (includes earnings)
   const { data: users, error: usersError } = await supabase
     .from('users')
     .select(`
       *,
       linked_accounts (*),
-      achievements (*)
+      achievements (*),
+      metrics (earnings)
     `);
 
   if (usersError) {
@@ -336,7 +337,10 @@ export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week
 
   // 5. Transform and Merge Data
   return users.map((row: any) => {
-    const metrics = userMetrics.get(row.id) || { views: 0, likes: 0, viral_clips: 0 };
+    const clipMetrics = userMetrics.get(row.id) || { views: 0, likes: 0, viral_clips: 0 };
+    // Get earnings from the metrics table (can be array or single object)
+    const metricsRow = Array.isArray(row.metrics) ? row.metrics[0] : row.metrics;
+    const earnings = metricsRow?.earnings || 0;
 
     return {
       id: row.id,
@@ -351,12 +355,12 @@ export async function getLeaderboardData(range: 'week' | 'month' | 'all' = 'week
         id: acc.platform_user_id
       })) || [],
       metrics: {
-        views: metrics.views,
-        likes: metrics.likes,
-        shares: 0, // Not tracked in clips yet
-        earnings: 0, // Not tracked in clips yet
-        viral_clips: metrics.viral_clips,
-        avg_views: 0, // Could calculate if needed
+        views: clipMetrics.views,
+        likes: clipMetrics.likes,
+        shares: 0,
+        earnings: earnings,
+        viral_clips: clipMetrics.viral_clips,
+        avg_views: 0,
         avg_likes: 0,
         total_posts: 0
       },
