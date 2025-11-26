@@ -22,12 +22,13 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Fake celebrity users with their social handles
+// Using reliable avatar sources (ui-avatars.com generates text avatars, or use Wikimedia Commons)
 const fakeUsers = [
     {
         id: 'fake_elon_musk',
         whopId: 'user_elonmusk',
         username: 'Elon Musk',
-        avatar: 'https://pbs.twimg.com/profile_images/1845482317183668224/Wo8sNvsB_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Elon_Musk_Royal_Society_%28crop2%29.jpg/220px-Elon_Musk_Royal_Society_%28crop2%29.jpg',
         platforms: [
             { platform: 'twitter', handle: 'elonmusk' },
             { platform: 'instagram', handle: 'elonmusk' },
@@ -47,7 +48,7 @@ const fakeUsers = [
         id: 'fake_sam_altman',
         whopId: 'user_samaltman',
         username: 'Sam Altman',
-        avatar: 'https://pbs.twimg.com/profile_images/804990434455887872/BG0Xh7Oa_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Sam_Altman_2024.jpg/220px-Sam_Altman_2024.jpg',
         platforms: [
             { platform: 'twitter', handle: 'sama' },
             { platform: 'youtube', handle: 'samaltman' },
@@ -67,7 +68,7 @@ const fakeUsers = [
         id: 'fake_jensen_huang',
         whopId: 'user_jensenhuang',
         username: 'Jensen Huang',
-        avatar: 'https://pbs.twimg.com/profile_images/1660422329388625920/nKg5QPME_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Jensen_Huang_at_The_Artificial_Intelligence_Forum_of_the_World_Economic_Forum_2024_%28cropped%29.jpg/220px-Jensen_Huang_at_The_Artificial_Intelligence_Forum_of_the_World_Economic_Forum_2024_%28cropped%29.jpg',
         platforms: [
             { platform: 'youtube', handle: 'nvidia' },
             { platform: 'tiktok', handle: 'nvidiaai' },
@@ -87,7 +88,7 @@ const fakeUsers = [
         id: 'fake_mark_zuckerberg',
         whopId: 'user_zuck',
         username: 'Mark Zuckerberg',
-        avatar: 'https://pbs.twimg.com/profile_images/1657055378702704641/1E00svJk_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg/220px-Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg',
         platforms: [
             { platform: 'instagram', handle: 'zuck' },
             { platform: 'tiktok', handle: 'zuck' },
@@ -107,7 +108,7 @@ const fakeUsers = [
         id: 'fake_sundar_pichai',
         whopId: 'user_sundarpichai',
         username: 'Sundar Pichai',
-        avatar: 'https://pbs.twimg.com/profile_images/864282616597405701/M-FEJMZ0_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Sundar_Pichai_%282023%29_%28cropped%29.jpg/220px-Sundar_Pichai_%282023%29_%28cropped%29.jpg',
         platforms: [
             { platform: 'twitter', handle: 'sundarpichai' },
             { platform: 'youtube', handle: 'google' },
@@ -127,7 +128,7 @@ const fakeUsers = [
         id: 'fake_satya_nadella',
         whopId: 'user_satyanadella',
         username: 'Satya Nadella',
-        avatar: 'https://pbs.twimg.com/profile_images/1221837516816306177/_Ld4un5A_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg/220px-MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg',
         platforms: [
             { platform: 'twitter', handle: 'sataborella' },
             { platform: 'instagram', handle: 'satyanadella' },
@@ -147,7 +148,7 @@ const fakeUsers = [
         id: 'fake_mr_beast',
         whopId: 'user_mrbeast',
         username: 'MrBeast',
-        avatar: 'https://pbs.twimg.com/profile_images/994592419705274369/RLplF55e_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/MrBeast_2023_%28cropped%29.jpg/220px-MrBeast_2023_%28cropped%29.jpg',
         platforms: [
             { platform: 'youtube', handle: 'MrBeast' },
             { platform: 'tiktok', handle: 'mrbeast' },
@@ -170,7 +171,7 @@ const fakeUsers = [
         id: 'fake_lex_fridman',
         whopId: 'user_lexfridman',
         username: 'Lex Fridman',
-        avatar: 'https://pbs.twimg.com/profile_images/956331551435960322/OaqR8pAB_400x400.jpg',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Lex_Fridman_Teaching%2C_Fall_2018.png/220px-Lex_Fridman_Teaching%2C_Fall_2018.png',
         platforms: [
             { platform: 'youtube', handle: 'lexfridman' },
             { platform: 'twitter', handle: 'lexfridman' },

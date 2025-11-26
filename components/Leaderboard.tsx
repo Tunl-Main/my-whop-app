@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Instagram, Youtube, Twitter, Eye, Flame, UserPlus, MessageCircle } from "lucide-react";
+import { Instagram, Youtube, Twitter, Eye, UserPlus, MessageCircle } from "lucide-react";
 import clsx from "clsx";
 import TopClips from "./TopClips";
 import RisingStars from "./RisingStars";
@@ -81,7 +81,7 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
                 getRankStyle()
             )}
         >
-            {/* Row 1: Rank, Avatar, Name + Fire */}
+            {/* Row 1: Rank, Avatar, Name + Platforms */}
             <div className="flex items-center">
                 {/* Rank Number */}
                 <div className={clsx(
@@ -107,27 +107,23 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
                     )}
                 </div>
 
-                {/* User Info - Name + Fire */}
-                <div className="flex items-center gap-1 min-w-0 flex-grow sm:flex-grow-0 sm:mr-4">
+                {/* User Info - Name with Platform Icons Below */}
+                <div className="flex flex-col min-w-0 flex-grow sm:flex-grow-0 sm:mr-4">
                     <span className="font-bold text-white text-xs sm:text-lg truncate max-w-[100px] sm:max-w-none">
                         {displayName}
                     </span>
-                    {(user.metrics.viral_clips || 0) > 0 && (
-                        <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400 flex-shrink-0" />
-                    )}
+                    {/* Platform icons below name */}
+                    <div className="flex items-center gap-1 mt-0.5">
+                        {user.linkedAccounts?.slice(0, 4).map((acc, i) => (
+                            <div key={i} className="flex items-center">
+                                {getPlatformIcon(acc.platform, "w-3 h-3 sm:w-4 sm:h-4 text-gray-400")}
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Desktop: Platform icons */}
-                <div className="hidden sm:flex items-center gap-1.5 mr-4">
-                    {user.linkedAccounts?.slice(0, 3).map((acc, i) => (
-                        <div key={i} className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5">
-                            {getPlatformIcon(acc.platform, "w-4 h-4")}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Desktop: Action Buttons */}
-                <div className="hidden sm:flex items-center gap-2 mr-4">
+                {/* Desktop: Action Buttons - Only visible on hover */}
+                <div className="hidden sm:flex items-center gap-2 mr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                         onClick={handleActionClick}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors shadow-lg shadow-orange-500/20"
@@ -171,26 +167,8 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
                 </div>
             </div>
 
-            {/* Row 2 (Mobile only): Actions + Stats inline */}
-            <div className="flex sm:hidden items-center justify-between">
-                {/* Action Buttons */}
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={handleActionClick}
-                        className="flex items-center justify-center w-6 h-6 rounded bg-orange-500 text-white"
-                        title="Follow"
-                    >
-                        <UserPlus className="w-3 h-3" />
-                    </button>
-                    <button
-                        onClick={handleActionClick}
-                        className="flex items-center justify-center w-6 h-6 rounded bg-white/10 text-white"
-                        title="Message"
-                    >
-                        <MessageCircle className="w-3 h-3" />
-                    </button>
-                </div>
-
+            {/* Row 2 (Mobile only): Stats inline - Actions appear on tap (card click opens modal) */}
+            <div className="flex sm:hidden items-center justify-end">
                 {/* Stats */}
                 <div className="flex items-center gap-3">
                     <div className="text-right">

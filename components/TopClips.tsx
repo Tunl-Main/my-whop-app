@@ -81,25 +81,16 @@ export default function TopClips({ timeRange = 'week' }: TopClipsProps) {
 
     return (
         <div className="space-y-8">
-            {/* Top 3 Grid - Compact */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            {/* Top 3 Grid - Smaller with Orange Glow */}
+            <div className="flex justify-center gap-4 mb-8">
                 {clips.slice(0, 3).map((clip, index) => {
                     const isPlaying = playingClipId === clip.id;
                     const embedUrl = getEmbedUrl(clip.url);
 
-                    const getRankStyles = (index: number) => {
-                        switch (index) {
-                            case 0: return "border-yellow-500/50 shadow-[0_0_30px_-5px_rgba(234,179,8,0.3)]";
-                            case 1: return "border-gray-400/50 shadow-[0_0_30px_-5px_rgba(156,163,175,0.3)]";
-                            case 2: return "border-orange-700/50 shadow-[0_0_30px_-5px_rgba(194,65,12,0.3)]";
-                            default: return "border-white/10 hover:border-orange-500/50";
-                        }
-                    };
-
                     return (
                         <div
                             key={clip.id}
-                            className={`group relative aspect-[9/16] rounded-xl overflow-hidden bg-black/40 border transition-all hover:scale-[1.02] shadow-2xl ${getRankStyles(index)}`}
+                            className="group relative w-36 sm:w-44 aspect-[9/16] rounded-xl overflow-hidden bg-black/40 border border-orange-500/60 transition-all hover:scale-[1.02] shadow-[0_0_25px_rgba(249,115,22,0.4),0_0_50px_rgba(249,115,22,0.2)]"
                         >
                             {isPlaying && embedUrl ? (
                                 <iframe
