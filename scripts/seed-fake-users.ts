@@ -21,8 +21,8 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Fake celebrity users with their social handles
-// Using reliable avatar sources (ui-avatars.com generates text avatars, or use Wikimedia Commons)
+// Fake celebrity users with VERIFIED working avatar URLs
+// Only including users whose Wikimedia Commons images actually load (HTTP 200)
 const fakeUsers = [
     {
         id: 'fake_elon_musk',
@@ -45,46 +45,6 @@ const fakeUsers = [
         earnings: 125000,
     },
     {
-        id: 'fake_sam_altman',
-        whopId: 'user_samaltman',
-        username: 'Sam Altman',
-        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Sam_Altman_2024.jpg/220px-Sam_Altman_2024.jpg',
-        platforms: [
-            { platform: 'twitter', handle: 'sama' },
-            { platform: 'youtube', handle: 'samaltman' },
-        ],
-        clips: [
-            { platform: 'twitter', views: 12000000, likes: 650000, daysAgo: 1 },
-            { platform: 'twitter', views: 8500000, likes: 420000, daysAgo: 4 },
-            { platform: 'youtube', views: 5200000, likes: 280000, daysAgo: 2 },
-            { platform: 'youtube', views: 3800000, likes: 195000, daysAgo: 6 },
-            // Previous period clips
-            { platform: 'twitter', views: 6000000, likes: 300000, daysAgo: 10 },
-            { platform: 'youtube', views: 4000000, likes: 200000, daysAgo: 14 },
-        ],
-        earnings: 85000,
-    },
-    {
-        id: 'fake_jensen_huang',
-        whopId: 'user_jensenhuang',
-        username: 'Jensen Huang',
-        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Jensen_Huang_at_The_Artificial_Intelligence_Forum_of_the_World_Economic_Forum_2024_%28cropped%29.jpg/220px-Jensen_Huang_at_The_Artificial_Intelligence_Forum_of_the_World_Economic_Forum_2024_%28cropped%29.jpg',
-        platforms: [
-            { platform: 'youtube', handle: 'nvidia' },
-            { platform: 'tiktok', handle: 'nvidiaai' },
-        ],
-        clips: [
-            { platform: 'youtube', views: 18500000, likes: 920000, daysAgo: 2 },
-            { platform: 'youtube', views: 14200000, likes: 710000, daysAgo: 5 },
-            { platform: 'tiktok', views: 9800000, likes: 580000, daysAgo: 1 },
-            { platform: 'tiktok', views: 7200000, likes: 390000, daysAgo: 3 },
-            // Previous period clips
-            { platform: 'youtube', views: 8000000, likes: 400000, daysAgo: 12 },
-            { platform: 'tiktok', views: 5000000, likes: 250000, daysAgo: 15 },
-        ],
-        earnings: 95000,
-    },
-    {
         id: 'fake_mark_zuckerberg',
         whopId: 'user_zuck',
         username: 'Mark Zuckerberg',
@@ -105,32 +65,12 @@ const fakeUsers = [
         earnings: 110000,
     },
     {
-        id: 'fake_sundar_pichai',
-        whopId: 'user_sundarpichai',
-        username: 'Sundar Pichai',
-        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Sundar_Pichai_%282023%29_%28cropped%29.jpg/220px-Sundar_Pichai_%282023%29_%28cropped%29.jpg',
-        platforms: [
-            { platform: 'twitter', handle: 'sundarpichai' },
-            { platform: 'youtube', handle: 'google' },
-        ],
-        clips: [
-            { platform: 'twitter', views: 6800000, likes: 340000, daysAgo: 2 },
-            { platform: 'twitter', views: 4200000, likes: 215000, daysAgo: 5 },
-            { platform: 'youtube', views: 9500000, likes: 485000, daysAgo: 1 },
-            { platform: 'youtube', views: 7100000, likes: 360000, daysAgo: 4 },
-            // Previous period clips
-            { platform: 'twitter', views: 3500000, likes: 175000, daysAgo: 11 },
-            { platform: 'youtube', views: 5000000, likes: 250000, daysAgo: 13 },
-        ],
-        earnings: 72000,
-    },
-    {
         id: 'fake_satya_nadella',
         whopId: 'user_satyanadella',
         username: 'Satya Nadella',
         avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg/220px-MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg',
         platforms: [
-            { platform: 'twitter', handle: 'sataborella' },
+            { platform: 'twitter', handle: 'satyanadella' },
             { platform: 'instagram', handle: 'satyanadella' },
         ],
         clips: [
@@ -167,30 +107,34 @@ const fakeUsers = [
         ],
         earnings: 350000,
     },
-    {
-        id: 'fake_lex_fridman',
-        whopId: 'user_lexfridman',
-        username: 'Lex Fridman',
-        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Lex_Fridman_Teaching%2C_Fall_2018.png/220px-Lex_Fridman_Teaching%2C_Fall_2018.png',
-        platforms: [
-            { platform: 'youtube', handle: 'lexfridman' },
-            { platform: 'twitter', handle: 'lexfridman' },
-        ],
-        clips: [
-            { platform: 'youtube', views: 8200000, likes: 420000, daysAgo: 2 },
-            { platform: 'youtube', views: 6500000, likes: 335000, daysAgo: 5 },
-            { platform: 'twitter', views: 3100000, likes: 158000, daysAgo: 1 },
-            { platform: 'twitter', views: 2400000, likes: 122000, daysAgo: 4 },
-            // Previous period clips
-            { platform: 'youtube', views: 4500000, likes: 230000, daysAgo: 11 },
-            { platform: 'twitter', views: 1800000, likes: 90000, daysAgo: 14 },
-        ],
-        earnings: 65000,
-    },
+];
+
+// IDs of fake users that should be deleted (avatars no longer working)
+const usersToDelete = [
+    'fake_sam_altman',
+    'fake_jensen_huang', 
+    'fake_sundar_pichai',
+    'fake_lex_fridman',
 ];
 
 async function seedDatabase() {
     console.log('🌱 Starting database seed...\n');
+
+    // First, delete old fake users with broken avatars
+    console.log('🗑️  Cleaning up old fake users with broken avatars...');
+    for (const userId of usersToDelete) {
+        // Delete in order: clips, linked_accounts, metrics, achievements, metric_snapshots, then user
+        await supabase.from('clips').delete().eq('user_id', userId);
+        await supabase.from('linked_accounts').delete().eq('user_id', userId);
+        await supabase.from('metrics').delete().eq('user_id', userId);
+        await supabase.from('achievements').delete().eq('user_id', userId);
+        await supabase.from('metric_snapshots').delete().eq('user_id', userId);
+        const { error } = await supabase.from('users').delete().eq('id', userId);
+        if (!error) {
+            console.log(`  ✅ Deleted ${userId}`);
+        }
+    }
+    console.log('');
 
     for (const user of fakeUsers) {
         console.log(`Creating user: ${user.username}`);
