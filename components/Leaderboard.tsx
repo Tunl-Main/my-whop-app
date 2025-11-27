@@ -311,7 +311,7 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                                     onClick={() => setFilter(f)}
                                     className={clsx(
                                         "px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[10px] sm:text-xs font-medium transition-all",
-                                        filter === f ? "bg-white/10 text-white" : "text-gray-500"
+                                        filter === f ? "bg-orange-500 text-white" : "text-gray-400"
                                     )}
                                 >
                                     {f === 'week' ? 'Week' : f === 'month' ? 'Month' : 'All'}
@@ -335,10 +335,10 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                                         <span className="hidden sm:inline ml-1">{s}</span>
                                     </button>
                                 ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
 
                 {/* Platform Filter - Top Border of Content */}
                 {(view === 'creators' || view === 'clips') && (
@@ -432,7 +432,7 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                             {loading && (
                                 <div className="text-center py-12 text-gray-500">
                                     Loading...
-                                </div>
+                        </div>
                             )}
                         </>
                     )}
