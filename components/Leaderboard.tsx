@@ -298,7 +298,7 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                                         view === v ? "bg-orange-500 text-white" : "text-gray-400"
                                     )}
                                 >
-                                    {v === 'creators' ? 'Clippers' : v === 'clips' ? 'Clips' : 'Rising'}
+                                    {v === 'creators' ? 'Clippers' : v === 'clips' ? 'Clips' : 'Rising Stars'}
                         </button>
                     ))}
             </div>
