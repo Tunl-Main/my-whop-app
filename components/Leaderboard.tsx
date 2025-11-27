@@ -231,11 +231,11 @@ interface LeaderboardProps {
 
 // Platform filter options
 const PLATFORM_FILTERS = [
-    { id: 'all', label: 'All' },
-    { id: 'instagram', label: 'IG' },
-    { id: 'tiktok', label: 'TT' },
-    { id: 'youtube', label: 'YT' },
-    { id: 'x', label: 'X' },
+    { id: 'all', label: 'All', fullLabel: 'All Platforms' },
+    { id: 'instagram', label: 'Instagram', fullLabel: 'Instagram' },
+    { id: 'tiktok', label: 'TikTok', fullLabel: 'TikTok' },
+    { id: 'youtube', label: 'YouTube', fullLabel: 'YouTube' },
+    { id: 'x', label: 'X', fullLabel: 'X' },
 ] as const;
 
 // Mini platform icon for filter buttons
@@ -384,30 +384,30 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                             </div>
                         )}
                     </div>
-
-                    {/* Platform Filter - Second Row */}
-                    {(view === 'creators' || view === 'clips') && (
-                        <div className="flex justify-center mt-3">
-                            <div className="flex bg-white/5 p-0.5 sm:p-1 rounded-lg border border-white/10">
-                                {PLATFORM_FILTERS.map((p) => (
-                                    <button
-                                        key={p.id}
-                                        onClick={() => setPlatform(p.id as typeof platform)}
-                                        className={clsx(
-                                            "flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[10px] sm:text-xs font-medium transition-all",
-                                            platform === p.id 
-                                                ? "bg-white/10 text-white" 
-                                                : "text-gray-500 hover:text-gray-300"
-                                        )}
-                                    >
-                                        {p.id !== 'all' && <FilterPlatformIcon platform={p.id} size={14} />}
-                                        <span>{p.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
+
+                {/* Platform Filter - Top Border of Content */}
+                {(view === 'creators' || view === 'clips') && (
+                    <div className="flex justify-center flex-wrap gap-2 sm:gap-3 px-4 sm:px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                        {PLATFORM_FILTERS.map((p) => (
+                            <button
+                                key={p.id}
+                                onClick={() => setPlatform(p.id as typeof platform)}
+                                className={clsx(
+                                    "flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all",
+                                    platform === p.id 
+                                        ? "bg-orange-500/20 text-orange-400 border border-orange-500/40 shadow-lg shadow-orange-500/10" 
+                                        : "bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white"
+                                )}
+                            >
+                                {p.id !== 'all' && <FilterPlatformIcon platform={p.id} size={22} />}
+                                {p.id === 'all' && <span className="text-base sm:text-lg">🌐</span>}
+                                <span className="hidden sm:inline">{p.fullLabel}</span>
+                                <span className="sm:hidden">{p.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {/* Content */}
                 <div className="p-6">
