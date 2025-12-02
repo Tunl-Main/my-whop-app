@@ -103,6 +103,7 @@ interface MiniProfileProps {
     username: string;
     onConnectAccount?: (platform: string) => void;
     community?: Community | null;
+    onChangeCommunity?: () => void;
 }
 
 // Helper for compact number formatting
@@ -113,7 +114,7 @@ const formatNumber = (num: number) => {
     }).format(num);
 };
 
-export default function MiniProfile({ user, username, onConnectAccount, community }: MiniProfileProps) {
+export default function MiniProfile({ user, username, onConnectAccount, community, onChangeCommunity }: MiniProfileProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showAccountsDropdown, setShowAccountsDropdown] = useState(false);
 
@@ -365,6 +366,40 @@ export default function MiniProfile({ user, username, onConnectAccount, communit
                                             </motion.div>
                                 )}
                                     </AnimatePresence>
+                                </div>
+
+                                {/* Community Allegiance Section */}
+                                <div className="mt-4 pt-4 border-t border-white/5">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                                                {community?.iconUrl ? (
+                                                    <img 
+                                                        src={community.iconUrl} 
+                                                        alt={community.name}
+                                                        className="w-full h-full rounded-xl object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="text-lg">🏴</span>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 uppercase tracking-wider">Representing</p>
+                                                <p className="text-sm font-medium text-white">
+                                                    {community?.name || 'No community selected'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onChangeCommunity?.();
+                                            }}
+                                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-orange-500/10 text-orange-400 border border-orange-500/30 hover:bg-orange-500/20 transition-colors"
+                                        >
+                                            {community ? 'Change' : 'Select'}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Achievements */}

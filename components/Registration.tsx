@@ -49,7 +49,9 @@ export default function Registration({
     const [showBioVerification, setShowBioVerification] = useState(false);
     const [showPledgeModal, setShowPledgeModal] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [userCommunity, setUserCommunity] = useState<{ id: string; name: string; iconUrl: string | null } | null>(null);
 
+    // Fetch user data
     useEffect(() => {
         if (propUserId) {
             fetch(`/api/user?whopId=${propUserId}`)
@@ -63,6 +65,18 @@ export default function Registration({
                         // Notify parent of connection status
                         const hasLinkedAccounts = data.linkedAccounts && data.linkedAccounts.length > 0;
                         onConnectionChange?.(hasLinkedAccounts);
+                        
+                        // Fetch community if user has pledged
+                        if (data.pledgedCommunityId) {
+                            fetch(`/api/pledge?whopId=${propUserId}`)
+                                .then(res => res.json())
+                                .then(pledgeData => {
+                                    if (pledgeData.pledgedCommunity) {
+                                        setUserCommunity(pledgeData.pledgedCommunity);
+                                    }
+                                })
+                                .catch(err => console.error("Error fetching pledge:", err));
+                        }
                     }
                 })
                 .catch(err => console.error("Error fetching user:", err));
@@ -82,6 +96,8 @@ export default function Registration({
                     user={user} 
                     username={propUsername || "User"} 
                     onConnectAccount={handleConnectNewAccount}
+                    community={userCommunity}
+                    onChangeCommunity={() => setShowPledgeModal(true)}
                 />
                 {/* Bio Verification Modal for connecting additional accounts */}
                 {showBioVerification && (selectedPlatform === 'tiktok' || selectedPlatform === 'youtube' || selectedPlatform === 'instagram') && (
@@ -123,8 +139,18 @@ export default function Registration({
                 <PledgeAllegianceModal
                     isOpen={showPledgeModal}
                     onClose={() => setShowPledgeModal(false)}
-                    onPledge={(communityId) => {
+                    onPledge={async (communityId) => {
                         setUser((prev: any) => prev ? { ...prev, pledgedCommunityId: communityId } : prev);
+                        // Fetch updated community info
+                        try {
+                            const res = await fetch(`/api/pledge?whopId=${propUserId}`);
+                            const data = await res.json();
+                            if (data.pledgedCommunity) {
+                                setUserCommunity(data.pledgedCommunity);
+                            }
+                        } catch (err) {
+                            console.error("Error fetching updated pledge:", err);
+                        }
                     }}
                     whopId={propUserId || ''}
                     currentCommunityId={user?.pledgedCommunityId}
