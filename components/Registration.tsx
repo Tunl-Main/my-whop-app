@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Loader2, Instagram, Youtube, Twitter } from "lucide-react";
 import { Button } from "@whop/react/components";
 import clsx from "clsx";
 import BioVerification from "./BioVerification";
 import MiniProfile from "./MiniProfile";
+import PledgeAllegianceModal from "./PledgeAllegianceModal";
 import { FrostedGlass } from "./FrostedGlass";
-import { useEffect } from "react";
 
 // Custom TikTok Icon
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -28,12 +28,18 @@ export default function Registration({
     userId: propUserId,
     username: propUsername,
     avatar: propAvatar,
-    onConnectionChange
+    onConnectionChange,
+    experienceId,
+    experienceName,
+    experienceIcon,
 }: {
     userId?: string;
     username?: string;
     avatar?: string;
     onConnectionChange?: (connected: boolean) => void;
+    experienceId?: string;
+    experienceName?: string;
+    experienceIcon?: string | null;
 } = {}) {
     const [selectedPlatform, setSelectedPlatform] = useState<typeof PLATFORMS[number]['id']>('instagram');
     const [otp, setOtp] = useState<string | null>(null);
@@ -41,6 +47,7 @@ export default function Registration({
     const [copied, setCopied] = useState(false);
     const [isLinked, setIsLinked] = useState(false);
     const [showBioVerification, setShowBioVerification] = useState(false);
+    const [showPledgeModal, setShowPledgeModal] = useState(false);
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
@@ -103,9 +110,28 @@ export default function Registration({
                             // Notify parent of connection status
                             const hasLinkedAccounts = data.user?.linkedAccounts && data.user.linkedAccounts.length > 0;
                             onConnectionChange?.(hasLinkedAccounts);
+                            
+                            // Check if user needs to pledge allegiance
+                            if (!data.user?.pledgedCommunityId && experienceId) {
+                                setShowPledgeModal(true);
+                            }
                         }}
                     />
                 )}
+                
+                {/* Pledge Allegiance Modal */}
+                <PledgeAllegianceModal
+                    isOpen={showPledgeModal}
+                    onClose={() => setShowPledgeModal(false)}
+                    onPledge={(communityId) => {
+                        setUser((prev: any) => prev ? { ...prev, pledgedCommunityId: communityId } : prev);
+                    }}
+                    whopId={propUserId || ''}
+                    currentCommunityId={user?.pledgedCommunityId}
+                    currentExperienceId={experienceId}
+                    currentExperienceName={experienceName}
+                    currentExperienceIcon={experienceIcon}
+                />
             </>
         );
     }
@@ -320,9 +346,30 @@ export default function Registration({
                         setIsLinked(true);
                         // Refresh user data to show MiniProfile immediately
                         setUser(data.user);
+                        // Notify parent of connection
+                        onConnectionChange?.(true);
+                        
+                        // Show pledge modal for new users
+                        if (experienceId) {
+                            setShowPledgeModal(true);
+                        }
                     }}
                 />
             )}
+            
+            {/* Pledge Allegiance Modal for new users */}
+            <PledgeAllegianceModal
+                isOpen={showPledgeModal}
+                onClose={() => setShowPledgeModal(false)}
+                onPledge={(communityId) => {
+                    setUser((prev: any) => prev ? { ...prev, pledgedCommunityId: communityId } : prev);
+                }}
+                whopId={propUserId || ''}
+                currentCommunityId={user?.pledgedCommunityId}
+                currentExperienceId={experienceId}
+                currentExperienceName={experienceName}
+                currentExperienceIcon={experienceIcon}
+            />
         </div>
     );
 }

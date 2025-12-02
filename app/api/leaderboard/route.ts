@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLeaderboardData, User } from '@/lib/db';
+import { getLeaderboardData, User, getCommunity } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,8 +8,9 @@ export async function GET(request: NextRequest) {
     const range = (searchParams.get('range') as 'week' | 'month' | 'all') || 'week';
     const sortBy = (searchParams.get('sortBy') as 'views' | 'earnings' | 'likes') || 'views';
     const platform = searchParams.get('platform') as 'instagram' | 'tiktok' | 'youtube' | 'twitter' | null;
+    const communityId = searchParams.get('communityId');
 
-    const users = await getLeaderboardData(range, platform || undefined);
+    const users = await getLeaderboardData(range, platform || undefined, communityId || undefined);
 
     const sortedUsers = users
         .filter((u: User) => u.linkedAccounts && u.linkedAccounts.length > 0) // Only show linked users
@@ -32,5 +33,15 @@ export async function GET(request: NextRequest) {
             }
         });
 
-    return NextResponse.json(sortedUsers);
+    // If filtering by community, include community info in response
+    let communityInfo = null;
+    if (communityId) {
+        communityInfo = await getCommunity(communityId);
+    }
+
+    return NextResponse.json({
+        users: sortedUsers,
+        community: communityInfo,
+        totalCount: sortedUsers.length,
+    });
 }

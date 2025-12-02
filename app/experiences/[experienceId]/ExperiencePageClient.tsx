@@ -8,13 +8,24 @@ interface ExperiencePageClientProps {
 	userId: string;
 	username: string;
 	avatar: string;
+	experienceId: string;
+	experienceName: string;
+	experienceIcon: string | null;
 }
 
-export default function ExperiencePageClient({ userId, username, avatar }: ExperiencePageClientProps) {
+export default function ExperiencePageClient({ 
+	userId, 
+	username, 
+	avatar,
+	experienceId,
+	experienceName,
+	experienceIcon,
+}: ExperiencePageClientProps) {
 	const [isUserConnected, setIsUserConnected] = useState(false);
+	const [userCommunityId, setUserCommunityId] = useState<string | null>(null);
 	const registrationRef = useRef<{ triggerConnect: () => void } | null>(null);
 
-	// Check if user has connected accounts
+	// Check if user has connected accounts and their pledged community
 	useEffect(() => {
 		if (userId) {
 			fetch(`/api/user?whopId=${userId}`)
@@ -23,6 +34,10 @@ export default function ExperiencePageClient({ userId, username, avatar }: Exper
 					// User is "connected" if they have at least one linked account
 					const hasLinkedAccounts = data.linkedAccounts && data.linkedAccounts.length > 0;
 					setIsUserConnected(hasLinkedAccounts);
+					// Set user's pledged community if available
+					if (data.pledgedCommunityId) {
+						setUserCommunityId(data.pledgedCommunityId);
+					}
 				})
 				.catch(() => {
 					setIsUserConnected(false);
@@ -87,6 +102,9 @@ export default function ExperiencePageClient({ userId, username, avatar }: Exper
 								username={username} 
 								avatar={avatar}
 								onConnectionChange={(connected) => setIsUserConnected(connected)}
+								experienceId={experienceId}
+								experienceName={experienceName}
+								experienceIcon={experienceIcon}
 							/>
 						</div>
 					</div>
@@ -95,6 +113,10 @@ export default function ExperiencePageClient({ userId, username, avatar }: Exper
 						<Leaderboard 
 							isUserConnected={isUserConnected} 
 							onConnectClick={handleConnectClick}
+							currentExperienceId={experienceId}
+							currentExperienceName={experienceName}
+							currentExperienceIcon={experienceIcon}
+							userCommunityId={userCommunityId}
 						/>
 					</div>
 				</div>

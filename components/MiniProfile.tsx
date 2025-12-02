@@ -73,6 +73,12 @@ interface Achievement {
     date: number;
 }
 
+interface Community {
+    id: string;
+    name: string;
+    iconUrl: string | null;
+}
+
 interface User {
     id: string;
     whopId: string;
@@ -89,12 +95,14 @@ interface User {
         viral_clips?: number;
     };
     achievements: Achievement[];
+    pledgedCommunityId?: string;
 }
 
 interface MiniProfileProps {
     user: User;
     username: string;
     onConnectAccount?: (platform: string) => void;
+    community?: Community | null;
 }
 
 // Helper for compact number formatting
@@ -105,7 +113,7 @@ const formatNumber = (num: number) => {
     }).format(num);
 };
 
-export default function MiniProfile({ user, username, onConnectAccount }: MiniProfileProps) {
+export default function MiniProfile({ user, username, onConnectAccount, community }: MiniProfileProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showAccountsDropdown, setShowAccountsDropdown] = useState(false);
 
@@ -150,7 +158,33 @@ export default function MiniProfile({ user, username, onConnectAccount }: MiniPr
 
                         {/* User Info */}
                         <div className="flex-grow min-w-0">
-                            <h3 className="text-white font-bold text-lg truncate">{username}</h3>
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-white font-bold text-lg truncate">{username}</h3>
+                                {/* Community Badge */}
+                                {community && (
+                                    <div 
+                                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/30"
+                                        title={`Representing ${community.name}`}
+                                    >
+                                        {community.iconUrl ? (
+                                            <img 
+                                                src={community.iconUrl} 
+                                                alt={community.name}
+                                                className="w-4 h-4 rounded-sm object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-4 h-4 rounded-sm bg-orange-500/30 flex items-center justify-center">
+                                                <span className="text-[8px] text-orange-400 font-bold">
+                                                    {community.name.charAt(0).toUpperCase()}
+                                                </span>
+                                            </div>
+                                        )}
+                                        <span className="text-xs text-orange-400 font-medium truncate max-w-[80px]">
+                                            {community.name}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                             
                             {/* Connected Platforms Row - App Store Style Icons */}
                             <div className="flex items-center gap-2 mt-2">

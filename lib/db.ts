@@ -32,6 +32,28 @@ export interface User {
   achievements: Achievement[];
   otp?: string;
   otpExpires?: number;
+  pledgedCommunityId?: string;
+  pledgedAt?: string;
+}
+
+export interface Community {
+  id: string;           // Whop experience_id
+  name: string;
+  iconUrl: string | null;
+  totalMembers: number;
+  totalViews: number;
+  totalClips: number;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommunityLeaderboardEntry extends Community {
+  topClipper?: {
+    username: string;
+    avatar: string;
+    views: number;
+  };
 }
 
 // Helper to transform Supabase result to User object
@@ -43,6 +65,8 @@ function transformUser(row: any): User {
     avatar: row.avatar,
     otp: row.otp,
     otpExpires: row.otp_expires,
+    pledgedCommunityId: row.pledged_community_id || undefined,
+    pledgedAt: row.pledged_at || undefined,
     linkedAccounts: row.linked_accounts?.map((acc: any) => ({
       platform: acc.platform,
       handle: acc.handle,
@@ -287,7 +311,8 @@ export async function getTopClips(
 
 export async function getLeaderboardData(
   range: 'week' | 'month' | 'all' = 'week',
-  platform?: 'instagram' | 'tiktok' | 'youtube' | 'twitter'
+  platform?: 'instagram' | 'tiktok' | 'youtube' | 'twitter',
+  communityId?: string
 ): Promise<User[]> {
   // 1. Calculate start date based on range
   let startDate: string | null = null;
@@ -302,7 +327,7 @@ export async function getLeaderboardData(
   }
 
   // 2. Fetch Users with metrics (includes earnings)
-  const { data: users, error: usersError } = await supabase
+  let usersQuery = supabase
     .from('users')
     .select(`
       *,
@@ -310,6 +335,13 @@ export async function getLeaderboardData(
       achievements (*),
       metrics (earnings)
     `);
+
+  // Filter by community if specified
+  if (communityId) {
+    usersQuery = usersQuery.eq('pledged_community_id', communityId);
+  }
+
+  const { data: users, error: usersError } = await usersQuery;
 
   if (usersError) {
     console.error('Error fetching users:', usersError);
@@ -366,6 +398,8 @@ export async function getLeaderboardData(
       avatar: row.avatar,
       otp: row.otp,
       otpExpires: row.otp_expires,
+      pledgedCommunityId: row.pledged_community_id || undefined,
+      pledgedAt: row.pledged_at || undefined,
       linkedAccounts: row.linked_accounts?.map((acc: any) => ({
         platform: acc.platform,
         handle: acc.handle,
@@ -389,4 +423,261 @@ export async function getLeaderboardData(
       })) || []
     };
   });
+}
+
+// ============================================================
+// COMMUNITY FUNCTIONS
+// ============================================================
+
+/**
+ * Get all communities, optionally filtered by featured status
+ */
+export async function getCommunities(featuredOnly: boolean = false): Promise<Community[]> {
+  let query = supabase
+    .from('communities')
+    .select('*')
+    .order('total_views', { ascending: false });
+
+  if (featuredOnly) {
+    query = query.eq('is_featured', true);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('[db] getCommunities failed:', error);
+    throw new Error(`Failed to fetch communities: ${error.message}`);
+  }
+
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    iconUrl: row.icon_url,
+    totalMembers: row.total_members || 0,
+    totalViews: row.total_views || 0,
+    totalClips: row.total_clips || 0,
+    isFeatured: row.is_featured || false,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }));
+}
+
+/**
+ * Get a single community by ID
+ */
+export async function getCommunity(communityId: string): Promise<Community | null> {
+  const { data, error } = await supabase
+    .from('communities')
+    .select('*')
+    .eq('id', communityId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // No rows returned
+      return null;
+    }
+    console.error('[db] getCommunity failed:', error);
+    throw new Error(`Failed to fetch community: ${error.message}`);
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    iconUrl: data.icon_url,
+    totalMembers: data.total_members || 0,
+    totalViews: data.total_views || 0,
+    totalClips: data.total_clips || 0,
+    isFeatured: data.is_featured || false,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
+}
+
+/**
+ * Create or update a community record
+ * Auto-detects from Whop experience when users visit
+ */
+export async function upsertCommunity(
+  experienceId: string,
+  name: string,
+  iconUrl: string | null
+): Promise<Community> {
+  const { data, error } = await supabase
+    .from('communities')
+    .upsert({
+      id: experienceId,
+      name,
+      icon_url: iconUrl,
+      updated_at: new Date().toISOString(),
+    }, {
+      onConflict: 'id',
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('[db] upsertCommunity failed:', error);
+    throw new Error(`Failed to upsert community: ${error.message}`);
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    iconUrl: data.icon_url,
+    totalMembers: data.total_members || 0,
+    totalViews: data.total_views || 0,
+    totalClips: data.total_clips || 0,
+    isFeatured: data.is_featured || false,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
+}
+
+/**
+ * Set a user's pledged community
+ */
+export async function pledgeToCommunity(userId: string, communityId: string): Promise<void> {
+  const { error } = await supabase
+    .from('users')
+    .update({
+      pledged_community_id: communityId,
+      pledged_at: new Date().toISOString(),
+    })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('[db] pledgeToCommunity failed:', error);
+    throw new Error(`Failed to pledge to community: ${error.message}`);
+  }
+}
+
+/**
+ * Get a user's pledged community with details
+ */
+export async function getUserPledgedCommunity(userId: string): Promise<Community | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('pledged_community_id')
+    .eq('id', userId)
+    .single();
+
+  if (error || !data?.pledged_community_id) {
+    return null;
+  }
+
+  return getCommunity(data.pledged_community_id);
+}
+
+/**
+ * Get community leaderboard with aggregated stats
+ * Returns communities ranked by total views with top clipper info
+ */
+export async function getCommunityLeaderboard(): Promise<CommunityLeaderboardEntry[]> {
+  // 1. Fetch all communities
+  const { data: communities, error: communitiesError } = await supabase
+    .from('communities')
+    .select('*')
+    .order('total_views', { ascending: false });
+
+  if (communitiesError) {
+    console.error('[db] getCommunityLeaderboard failed:', communitiesError);
+    throw new Error(`Failed to fetch community leaderboard: ${communitiesError.message}`);
+  }
+
+  // 2. For each community, calculate aggregated stats from users
+  const result: CommunityLeaderboardEntry[] = [];
+
+  for (const community of communities || []) {
+    // Get users in this community with their clips
+    const { data: users } = await supabase
+      .from('users')
+      .select(`
+        id,
+        username,
+        avatar,
+        clips (views)
+      `)
+      .eq('pledged_community_id', community.id);
+
+    let totalViews = 0;
+    let totalClips = 0;
+    let topClipper: { username: string; avatar: string; views: number } | undefined;
+    let maxUserViews = 0;
+
+    (users || []).forEach((user: any) => {
+      const userViews = (user.clips || []).reduce((sum: number, clip: any) => sum + (clip.views || 0), 0);
+      const userClips = (user.clips || []).length;
+
+      totalViews += userViews;
+      totalClips += userClips;
+
+      if (userViews > maxUserViews) {
+        maxUserViews = userViews;
+        topClipper = {
+          username: user.username || 'Unknown',
+          avatar: user.avatar || '',
+          views: userViews,
+        };
+      }
+    });
+
+    result.push({
+      id: community.id,
+      name: community.name,
+      iconUrl: community.icon_url,
+      totalMembers: (users || []).length,
+      totalViews,
+      totalClips,
+      isFeatured: community.is_featured || false,
+      createdAt: community.created_at,
+      updatedAt: community.updated_at,
+      topClipper,
+    });
+  }
+
+  // Sort by total views descending
+  result.sort((a, b) => b.totalViews - a.totalViews);
+
+  return result;
+}
+
+/**
+ * Update community stats (call periodically via cron)
+ */
+export async function updateCommunityStats(communityId: string): Promise<void> {
+  // Get users in this community with their clips
+  const { data: users } = await supabase
+    .from('users')
+    .select(`
+      id,
+      clips (views)
+    `)
+    .eq('pledged_community_id', communityId);
+
+  let totalViews = 0;
+  let totalClips = 0;
+
+  (users || []).forEach((user: any) => {
+    const userViews = (user.clips || []).reduce((sum: number, clip: any) => sum + (clip.views || 0), 0);
+    const userClips = (user.clips || []).length;
+
+    totalViews += userViews;
+    totalClips += userClips;
+  });
+
+  const { error } = await supabase
+    .from('communities')
+    .update({
+      total_members: (users || []).length,
+      total_views: totalViews,
+      total_clips: totalClips,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', communityId);
+
+  if (error) {
+    console.error('[db] updateCommunityStats failed:', error);
+    throw new Error(`Failed to update community stats: ${error.message}`);
+  }
 }

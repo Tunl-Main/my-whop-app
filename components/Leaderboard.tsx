@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Eye, UserPlus, MessageCircle, Lock } from "lucide-react";
+import { Eye, UserPlus, MessageCircle, Lock, Users } from "lucide-react";
 import clsx from "clsx";
 import TopClips from "./TopClips";
 import RisingStars from "./RisingStars";
 import UserProfileModal from "./UserProfileModal";
+import CommunityLeaderboard from "./CommunityLeaderboard";
 
 // Platform icon image paths
 const PLATFORM_ICONS: Record<string, string> = {
@@ -60,6 +61,7 @@ interface User {
         viral_clips?: number;
     };
     achievements?: { icon: string; name: string }[];
+    pledgedCommunityId?: string;
 }
 
 // Helper for compact number formatting
@@ -208,6 +210,10 @@ const LeaderboardRow = ({ user, rank, onUserClick }: { user: User; rank: number;
 interface LeaderboardProps {
     isUserConnected?: boolean;
     onConnectClick?: () => void;
+    currentExperienceId?: string;
+    currentExperienceName?: string;
+    currentExperienceIcon?: string | null;
+    userCommunityId?: string | null;
 }
 
 // Platform filter options
@@ -246,15 +252,24 @@ const FilterPlatformIcon = ({ platform, size = 14 }: { platform: string; size?: 
     );
 };
 
-export default function Leaderboard({ isUserConnected = false, onConnectClick }: LeaderboardProps) {
+export default function Leaderboard({ 
+    isUserConnected = false, 
+    onConnectClick,
+    currentExperienceId,
+    currentExperienceName,
+    currentExperienceIcon,
+    userCommunityId,
+}: LeaderboardProps) {
     const [users, setUsers] = useState<User[]>([]);
     const [filter, setFilter] = useState<'week' | 'month' | 'all'>('week');
     const [sortBy, setSortBy] = useState<'views' | 'likes' | 'earnings'>('views');
     const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok' | 'youtube' | 'x'>('all');
-    const [view, setView] = useState<'creators' | 'clips' | 'rising'>('creators');
+    const [view, setView] = useState<'creators' | 'clips' | 'rising' | 'communities'>('creators');
     const [loading, setLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showMyCommunityOnly, setShowMyCommunityOnly] = useState(false);
+    const [communityInfo, setCommunityInfo] = useState<{ name: string; totalCount: number } | null>(null);
 
     const handleUserClick = (user: User) => {
         setSelectedUser(user);
@@ -269,13 +284,26 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
     useEffect(() => {
         setLoading(true);
         const platformParam = platform !== 'all' ? `&platform=${platform === 'x' ? 'twitter' : platform}` : '';
-        fetch(`/api/leaderboard?range=${filter}&sortBy=${sortBy}${platformParam}`)
+        const communityParam = showMyCommunityOnly && userCommunityId ? `&communityId=${userCommunityId}` : '';
+        fetch(`/api/leaderboard?range=${filter}&sortBy=${sortBy}${platformParam}${communityParam}`)
             .then(res => res.json())
             .then(data => {
-                setUsers(data);
+                // Handle new response format { users, community, totalCount }
+                if (data.users) {
+                    setUsers(data.users);
+                    if (data.community) {
+                        setCommunityInfo({ name: data.community.name, totalCount: data.totalCount });
+                    } else {
+                        setCommunityInfo(null);
+                    }
+                } else {
+                    // Fallback for old format (array directly)
+                    setUsers(Array.isArray(data) ? data : []);
+                    setCommunityInfo(null);
+                }
                 setLoading(false);
             });
-    }, [filter, sortBy, platform]);
+    }, [filter, sortBy, platform, showMyCommunityOnly, userCommunityId]);
 
     return (
         <div className="w-full">
@@ -289,7 +317,7 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                     <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                         {/* View Toggle */}
                         <div className="flex bg-white/5 p-0.5 sm:p-1 rounded-lg border border-white/10">
-                            {(['creators', 'clips', 'rising'] as const).map((v) => (
+                            {(['creators', 'clips', 'rising', 'communities'] as const).map((v) => (
                         <button
                                     key={v}
                                     onClick={() => setView(v)}
@@ -298,10 +326,26 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                                         view === v ? "bg-orange-500 text-white" : "text-gray-400"
                                     )}
                                 >
-                                    {v === 'creators' ? 'Clippers' : v === 'clips' ? 'Clips' : 'Rising Stars'}
+                                    {v === 'creators' ? 'Clippers' : v === 'clips' ? 'Clips' : v === 'rising' ? 'Rising Stars' : 'Communities'}
                         </button>
                     ))}
             </div>
+                        
+                        {/* My Community Toggle - Only show when user has a community */}
+                        {userCommunityId && view === 'creators' && (
+                            <button
+                                onClick={() => setShowMyCommunityOnly(!showMyCommunityOnly)}
+                                className={clsx(
+                                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                                    showMyCommunityOnly 
+                                        ? "bg-orange-500/20 text-orange-400 border-orange-500/40" 
+                                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
+                                )}
+                            >
+                                <span>👥</span>
+                                <span className="hidden sm:inline">My Community</span>
+                            </button>
+                        )}
 
                         {/* Time Filter */}
                         <div className="flex bg-white/5 p-0.5 sm:p-1 rounded-lg border border-white/10">
@@ -367,6 +411,29 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                 <div className="p-6">
                     {view === 'creators' && (
                         <>
+                            {/* Community Context - Show when filtering by community */}
+                            {showMyCommunityOnly && communityInfo && (
+                                <div className="mb-4 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-2xl">👥</span>
+                                            <div>
+                                                <h3 className="text-white font-bold">{communityInfo.name}</h3>
+                                                <p className="text-sm text-orange-400">
+                                                    {communityInfo.totalCount} clippers in this community
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowMyCommunityOnly(false)}
+                                            className="text-xs text-gray-400 hover:text-white px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                                        >
+                                            Show All
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            
                             {/* Leaderboard Rows - Show top 3 always, blur rest if not connected */}
                             <div className="space-y-3">
                                 {/* Top 3 - Always visible */}
@@ -443,6 +510,10 @@ export default function Leaderboard({ isUserConnected = false, onConnectClick }:
                     
                     {view === 'rising' && (
                         <RisingStars variant="full" timeRange={filter} />
+                    )}
+                    
+                    {view === 'communities' && (
+                        <CommunityLeaderboard />
                     )}
                 </div>
             </div>
