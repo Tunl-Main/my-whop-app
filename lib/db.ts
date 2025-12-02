@@ -40,6 +40,7 @@ export interface Community {
   id: string;           // Whop experience_id
   name: string;
   iconUrl: string | null;
+  joinUrl: string | null;
   totalMembers: number;
   totalViews: number;
   totalClips: number;
@@ -453,6 +454,7 @@ export async function getCommunities(featuredOnly: boolean = false): Promise<Com
     id: row.id,
     name: row.name,
     iconUrl: row.icon_url,
+    joinUrl: row.join_url || null,
     totalMembers: row.total_members || 0,
     totalViews: row.total_views || 0,
     totalClips: row.total_clips || 0,
@@ -485,6 +487,7 @@ export async function getCommunity(communityId: string): Promise<Community | nul
     id: data.id,
     name: data.name,
     iconUrl: data.icon_url,
+    joinUrl: data.join_url || null,
     totalMembers: data.total_members || 0,
     totalViews: data.total_views || 0,
     totalClips: data.total_clips || 0,
@@ -525,6 +528,7 @@ export async function upsertCommunity(
     id: data.id,
     name: data.name,
     iconUrl: data.icon_url,
+    joinUrl: data.join_url || null,
     totalMembers: data.total_members || 0,
     totalViews: data.total_views || 0,
     totalClips: data.total_clips || 0,
@@ -626,6 +630,7 @@ export async function getCommunityLeaderboard(): Promise<CommunityLeaderboardEnt
       id: community.id,
       name: community.name,
       iconUrl: community.icon_url,
+      joinUrl: community.join_url || null,
       totalMembers: (users || []).length,
       totalViews,
       totalClips,

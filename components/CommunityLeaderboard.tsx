@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Eye, Film, Trophy, Loader2, Crown } from "lucide-react";
+import { Users, Eye, Film, Trophy, Loader2, Crown, ExternalLink } from "lucide-react";
 
 interface Community {
   id: string;
   name: string;
   iconUrl: string | null;
+  joinUrl: string | null;
   totalMembers: number;
   totalViews: number;
   totalClips: number;
@@ -43,12 +44,19 @@ const CommunityRow = ({ community, rank }: { community: Community; rank: number 
     return rank.toString();
   };
 
+  const handleJoinClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (community.joinUrl) {
+      window.open(community.joinUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: rank * 0.05 }}
-      className={`relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] ${getRankStyle()}`}
+      className={`relative flex items-center p-4 rounded-xl border bg-gradient-to-r transition-all hover:scale-[1.005] group ${getRankStyle()}`}
     >
       {/* Rank */}
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg mr-4 flex-shrink-0 ${
@@ -148,6 +156,17 @@ const CommunityRow = ({ community, rank }: { community: Community; rank: number 
           <p className="text-[8px] text-gray-500 uppercase">Members</p>
         </div>
       </div>
+
+      {/* Join Button */}
+      {community.joinUrl && (
+        <button
+          onClick={handleJoinClick}
+          className="ml-4 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-all flex items-center gap-2 flex-shrink-0 opacity-80 group-hover:opacity-100"
+        >
+          <span className="hidden sm:inline">Join</span>
+          <ExternalLink className="w-4 h-4" />
+        </button>
+      )}
     </motion.div>
   );
 };
